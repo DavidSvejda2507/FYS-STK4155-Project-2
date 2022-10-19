@@ -5,11 +5,11 @@ class Model():
     Creates a model with layers of nodes.
 
     Args:
-        W (np.arraylike) : weights for each node in each layer
-        B (np.arraylike) : Bias for each noe in each layer
-        AF (np.arraylike) : Activation fucntion for each layer
+        W (list of np.arraylike) : weights for each node in each layer
+        B (list of np.arraylike) : Bias for each noede in each layer
+        AF (list of tuples of functions(np.array) and their derivatives) : Activation function for each layer
     """
-    def __init__(self, W, B):
+    def __init__(self, W, B, AF):
         self.layers = np.array(\
         [Layer(W_i, B_i, AF_i) for W_i, B_i, AF_i in zip(W, B, AF)])
 
@@ -26,7 +26,7 @@ class Model():
 
 class Layer():
     """
-    Creates a array of nodes in Layer object.
+    Creates an array of nodes in Layer object.
 
     Args:
         w (np.arraylike (n_nodes, n_weights)) : weights for each node
@@ -35,7 +35,7 @@ class Layer():
 
     """
     def __init__(self, w, b, af):
-        self.nodes = np.array([Node(w_i, b_i, af) for wi, bi in zip(w, b)])
+        self.nodes = np.array([Node(w_i, b_i, af) for w_i, b_i in zip(w, b)])
         self.n_nodes = len(self.nodes)
         self.w = w
         self.b = b

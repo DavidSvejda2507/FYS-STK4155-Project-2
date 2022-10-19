@@ -46,6 +46,7 @@ def test_gradient_descent():
     
         beta, iters, log = gradient_descent(derivative, beta0, {}, 0.08, momentum = 1.8, log = True)
         assert len(w) == 0
+        assert np.allclose(beta, np.array((2., 3.)), 1e-5, 1e-5)
         # print(beta, iters)
         # log = np.array(log)
         # plt.plot(log[:,0], log[:,1])
