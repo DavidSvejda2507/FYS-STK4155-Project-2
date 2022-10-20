@@ -6,7 +6,7 @@ def Linear():
         "Returns given value."
         return x
     
-    def Derivative(x):
+    def Derivative(x, Fx):
         return 1
     
     return Linear_, Derivative
@@ -24,7 +24,7 @@ def Sigmoid():
         out = xexp/(1+xexp)
         return out
     
-    def Derivative(x):
+    def Derivative(x, Fx):
         raise NotImplementedError()
     
     return Sigmoid_, Derivative
@@ -40,7 +40,7 @@ def ReLU():
         """
         return np.where(x>0, x, 0)
     
-    def Derivative(x):
+    def Derivative(x, Fx):
         return np.where(x>0, 1, 0)
     
     return ReLU_, Derivative
@@ -58,7 +58,7 @@ def LeakyReLU(alpha):
         """
         return np.where(x>0, x, alpha*x)
     
-    def Derivative(x):
+    def Derivative(x, Fx):
         return np.where(x>0, 1, alpha)
     
     return LeakyReLU_, Derivative

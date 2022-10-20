@@ -12,7 +12,7 @@ def convergence_warning(grad, eta):
     """    
     warn(f"Gradient descent didn't converge, stepsize was {grad} , limit is set to {eta}.", stacklevel=2)
 
-def gradient_descent(derivative, beta0, kwargs, lr, eta = 1e-8, epochs = 50, momentum = 1, log = False):
+def gradient_descent(derivative, beta0, kwargs, lr, eta = 1e-8, max_iter = 50, momentum = 1, log = False):
     """Perform gradient descent to optimise beta according to the derivatives of the cost function as defined by derivative
 
     Args:
@@ -21,7 +21,7 @@ def gradient_descent(derivative, beta0, kwargs, lr, eta = 1e-8, epochs = 50, mom
         kwargs (dict): kwargs for derivative function, such as data.
         lr (float): learning rate.
         eta (float, optional): Max error. Defaults to 1e-8.
-        epochs (int, optional): Max number of steps. Defaults to 50.
+        max_iter (int, optional): Max number of steps. Defaults to 50.
         momentum (float, optional): Size of the momentum effect. Defaults to 1.
         log (Bool, optional): Set to True to keep track of a log of the beta values. Defaults to False.
     """    
@@ -37,7 +37,7 @@ def gradient_descent(derivative, beta0, kwargs, lr, eta = 1e-8, epochs = 50, mom
         iters += 1
         if log: log_list.append(beta.copy())
         if (np.linalg.norm(d_beta) < eta): break
-        if (iters >= epochs):
+        if (iters >= max_iter):
             convergence_warning(np.linalg.norm(d_beta), eta)
             break
             
@@ -48,7 +48,7 @@ def gradient_descent(derivative, beta0, kwargs, lr, eta = 1e-8, epochs = 50, mom
 
 #### In Development #####
 
-def stochastic_gradient_descent(derivative, beta0, kwargs, kwarg_splitting_func, lr, eta = 1e-8, epochs = 50, momentum = 1, log = False):
+def stochastic_gradient_descent(derivative, beta0, kwargs, kwarg_splitting_func, lr, eta = 1e-8, max_iter = 50, momentum = 1, log = False):
     """Perform gradient descent to optimise beta according to the derivatives of the cost function as defined by derivative
 
     Args:
@@ -57,7 +57,7 @@ def stochastic_gradient_descent(derivative, beta0, kwargs, kwarg_splitting_func,
         kwargs (dict): kwargs for derivative function, such as data.
         lr (float): learning rate.
         eta (float, optional): Max error. Defaults to 1e-8.
-        epochs (int, optional): Max number of steps. Defaults to 50.
+        max_iter (int, optional): Max number of steps. Defaults to 50.
         momentum (float, optional): Size of the momentum effect. Defaults to 1.
         log (Bool, optional): Set to True to keep track of a log of the beta values. Defaults to False.
     """    
@@ -74,7 +74,7 @@ def stochastic_gradient_descent(derivative, beta0, kwargs, kwarg_splitting_func,
         iters += 1
         if log: log_list.append(beta.copy())
         if (np.linalg.norm(d_beta) < eta): break
-        if (iters >= epochs):
+        if (iters >= max_iter):
             convergence_warning(np.linalg.norm(d_beta), eta)
             break
             
