@@ -19,57 +19,57 @@ class Model():
         self.optimiser = optimiser
         self.optimiser.set_model(self)
     
-    def feed_forward(self, input):
+    def feed_forward(self, in_data):
         """Feed the input through the network
 
         Args:
-            input (np.array): Input data
+            in_data (np.array): Input data
 
         Returns:
             np.array: Output data
         """        
         for layer in self.layers:
-            input = layer.feed_forward(input)
-        return input
+            in_data = layer.feed_forward(in_data)
+        return in_data
     
-    def back_propagate(self, input, target, costFunc):
-        _, derivatives, Cost = self.layers[0].back_propagation(input, self.layers[1:], target, costFunc)
+    def back_propagate(self, in_data, target, costFunc):
+        _, derivatives, Cost = self.layers[0].back_propagation(in_data, self.layers[1:], target, costFunc)
         derivatives.reverse()
         self.optimiser.update(derivatives)
         return Cost.mean()
 
 class Layer():
     
-    def __init__(self, input, output, AF):
+    def __init__(self, in_data, output, AF):
         """Make a Neural Network layer
 
         Args:
-            input (int): size of the input
+            in_data (int): size of the input
             output (int): size of the layer
             AF ((func(np.array -> np.array)), derivative): Activation function
         """        
-        self.W = np.random.rand(output, input)
+        self.W = np.random.rand(output, in_data)
         self.B = np.random.rand(output, 1)
         self.AF = AF[0]
         self.dF = AF[1]
         
-    def feed_forward(self, input):
+    def feed_forward(self, in_data):
         """Feed the input through the layer
 
         Args:
-            input (np.array): Input data with shape (size of one input, number of inputs)
+            in_data (np.array): Input data with shape (size of one input, number of inputs)
         
         Returns:
             np.array: Output data
         """
-        input = (self.W @ input) + self.B
-        return self.AF(input)
+        in_data = (self.W @ in_data) + self.B
+        return self.AF(in_data)
     
-    def back_propagation(self, input, layers, target, costFunc):
+    def back_propagation(self, in_data, layers, target, costFunc):
         """Feed the input forward and then propagate the derivative backward
 
         Args:
-            input (np.array): Input of the layer, should have shape (size of one input, number of inputs)
+            in_data (np.array): Input of the layer, should have shape (size of one input, number of inputs)
             layers (List of layers): List of layers that come after this one in the network
             target (np.array): Array of the desired outputs that costFunc can use to calculate the cost
             costFunc (func(predictions, targets -> cost, derivatives)): Function to calculate the cost and the derivatives
@@ -79,7 +79,7 @@ class Layer():
             list_: List of the derivatives of all of the variables in this layer and the following layers
             Cost: Value of the cost function
         """   
-        intermediate_sum = (self.W @ input) + self.B
+        intermediate_sum = (self.W @ in_data) + self.B
         output = self.AF(intermediate_sum)
         
         if len(layers) > 0:
@@ -89,7 +89,7 @@ class Layer():
             Cost, dCdOUT = costFunc(output, target)
         
         dCdB = self.dF(intermediate_sum, output)*dCdOUT
-        dCdW = input[np.newaxis,:,:] * dCdB[:, np.newaxis, :]
+        dCdW = in_data[np.newaxis,:,:] * dCdB[:, np.newaxis, :]
         dCdIN = np.tensordot(self.W, dCdB, ((0,), (0,)))
         list_.append([dCdW, dCdB])
         return dCdIN, list_, Cost
