@@ -1,7 +1,15 @@
 import numpy as np
 
 def load_data(train=0.6, test=0.2, val=0.2):
+
+    """
+    Returns train test and val data set in the form
+
+    [(target, [flattened image (64,)]), ...]
+    """
+
     from sklearn.datasets import load_digits
+
     mnist = load_digits()
     n_images = len(mnist.images)
     n_train = int(train*n_images)
@@ -12,7 +20,5 @@ def load_data(train=0.6, test=0.2, val=0.2):
     train_set = Tar_Im[:n_train]
     test_set = Tar_Im[n_train:n_test]
     val_set = Tar_Im[n_test:]
+    
     return train_set, test_set, val_set
-
-t, tt, v = load_data()
-print(t[0, 1])
