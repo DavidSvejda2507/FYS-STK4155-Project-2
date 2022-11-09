@@ -35,7 +35,7 @@ class Model():
     def back_propagate(self, in_data, target, costFunc):
         _, derivatives, Cost = self.layers[0].back_propagation(in_data, self.layers[1:], target, costFunc)
         derivatives.reverse()
-        self.optimiser.update(derivatives)
+        self.optimiser.update_model(derivatives)
         return Cost.mean()
 
 class Layer():
