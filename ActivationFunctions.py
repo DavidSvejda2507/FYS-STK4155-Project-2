@@ -25,7 +25,7 @@ def Sigmoid():
         return out
     
     def Derivative(x, Fx):
-        raise NotImplementedError()
+        return Fx * (1-Fx)
     
     return Sigmoid_, Derivative
 

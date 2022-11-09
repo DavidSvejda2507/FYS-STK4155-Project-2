@@ -58,32 +58,51 @@ def test_neural_net():
     import optimisers as op
     import ActivationFunctions as AF
     
+    
+    def lr_func(count):
+        return 100/(10000+count)
+    optimiser = op.LrScheduleOptimiser(lr_func=lr_func, lamda = 2e-4)
+    
     # model = NN.Model((2, 20, 1), [AF.ReLU()]*2, op.MomentumOptimiser(0.005, 3))
-    model = NN.Model((2, 20, 1), [AF.ReLU()]*2, op.Optimiser(0.01))
+    model = NN.Model((2, 20, 1), [AF.Sigmoid(), AF.Linear()], optimiser=optimiser)
     
     def func(x, y):
-        return np.exp(x*x+y*y)
+        return np.exp(-(x*x+y*y))
     
     def costFunc(pred, correct):
         diff = (pred-correct)
         return diff**2, diff*2
     
-    inputs = np.random.rand(2,200)
-    targets = func(inputs[0], inputs[1])
     
     cost = 1e3
     dcost = 1
-    while(dcost>1e-10):
-        new_cost = model.back_propagate(inputs, targets, costFunc)
-        dcost = 0.5*dcost + cost-new_cost
-        cost = new_cost
-        # print("#", end = "", flush=True)
-        print(cost)
-        print(dcost)
+    count = 0
+    long_count = 0
+    try:
+        while(count < 20 and long_count <10000):
+            inputs = np.random.rand(2,1000)
+            targets = func(inputs[0], inputs[1]) + np.random.normal(scale = 0.1, size = 1000)
+            new_cost = model.back_propagate(inputs, targets, costFunc)
+            dcost = 0.5*dcost + cost-new_cost
+            cost = new_cost
+            if (dcost<1e-10):
+                count += 1
+            else:
+                count = 0
+                # long_count += 1
+            # print("#", end = "", flush=True)
+            print(cost)
+            print(dcost)
+    except(KeyboardInterrupt):
+        pass
+    print("\n")
+    print(optimiser.count)
     print("\n")
         
+    inputs = np.random.rand(2,200)
+    targets = func(inputs[0], inputs[1])
     predictions = model.feed_forward(inputs)
-    print(predictions-targets)
+    print(np.sort((predictions-targets)))
     assert np.allclose(predictions, targets, atol=0.1)
     
     
