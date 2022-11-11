@@ -4,6 +4,11 @@ import pytest
 import warnings
 import matplotlib.pyplot as plt
 
+import NeuralNet as NN
+import optimisers as op
+import ActivationFunctions as AF
+import lrSchedules as lr
+
 
 
 
@@ -53,38 +58,46 @@ def test_gradient_descent():
         # plt.plot(log[:,0], log[:,1])
         # plt.savefig("test.pdf")
 
-def test_neural_net():
-    import NeuralNet as NN
-    import optimisers as op
-    import ActivationFunctions as AF
+
+def test_neural_net(optimiser):
+    
+    
+    def lr_func(count):
+        return 100/(10000+count)
     
     # model = NN.Model((2, 20, 1), [AF.ReLU()]*2, op.MomentumOptimiser(0.005, 3))
-    model = NN.Model((2, 20, 1), [AF.ReLU()]*2, op.Optimiser(0.01))
+    # model = NN.Model((2, 20, 1), [AF.Sigmoid(), AF.Linear()], optimiser=optimiser)
+    model = NN.Model((2, 20, 2), [AF.Sigmoid(), AF.SoftMax()], optimiser=optimiser)
     
     def func(x, y):
-        return np.exp(x*x+y*y)
+        # return np.exp(-(x*x+y*y))
+        return np.stack([np.exp(-(x*x+y*y)), 1-np.exp(-(x*x+y*y))], axis = 0)
     
     def costFunc(pred, correct):
         diff = (pred-correct)
         return diff**2, diff*2
     
-    inputs = np.random.rand(2,200)
-    targets = func(inputs[0], inputs[1])
     
     cost = 1e3
     dcost = 1
-    while(dcost>1e-10):
-        new_cost = model.back_propagate(inputs, targets, costFunc)
-        dcost = 0.5*dcost + cost-new_cost
-        cost = new_cost
-        # print("#", end = "", flush=True)
-        print(cost)
-        print(dcost)
-    print("\n")
+    count = 0
+    long_count = 0
+    for i in range(5000):
+            inputs = np.random.rand(2,1000)
+            targets = func(inputs[0], inputs[1]) + np.random.normal(scale = 0.1, size = 1000)
+            new_cost = model.back_propagate(inputs, targets, costFunc)
+            print(new_cost)
+            # print(dcost)
+    # print("\n")
+    # print(optimiser.count)
+    # print("\n")
         
+    inputs = np.random.rand(2,200)
+    targets = func(inputs[0], inputs[1])
     predictions = model.feed_forward(inputs)
-    print(predictions-targets)
-    assert np.allclose(predictions, targets, atol=0.1)
+    print(np.sort((predictions-targets)))
+    print(optimiser.__class__)
+    assert np.allclose(predictions, targets, atol=0.2)
     
     
     
@@ -95,4 +108,18 @@ def test_neural_net():
 
 if __name__ == "__main__":
     test_gradient_descent()
-    test_neural_net()
+    
+    optimisers = [
+        # Sigmoid Tests
+        # op.Optimiser(0.01, lamda = 2e-4),
+        # op.AdaGradOptimiser(0.05, 1e-8, lamda = 1e-4),
+        # op.MomentumOptimiser(0.01, momentum = 2, lamda = 0.01),
+        # op.RMSPropOptimiser(0.01, 1e-8, 0.9),
+        # op.AdamOptimiser(0.01, 1e-8, 0.9, 0.999, lamda = 1e-4)
+        
+        # Softmax Tests
+        op.Optimiser(0.1, lamda = 2e-4),
+        
+                  ]
+    for optimiser in optimisers:
+        test_neural_net(optimiser)

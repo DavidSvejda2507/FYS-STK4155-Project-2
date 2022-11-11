@@ -25,7 +25,7 @@ def Sigmoid():
         return out
     
     def Derivative(x, Fx):
-        raise NotImplementedError()
+        return Fx * (1-Fx)
     
     return Sigmoid_, Derivative
 
@@ -62,3 +62,26 @@ def LeakyReLU(alpha):
         return np.where(x>0, 1, alpha)
     
     return LeakyReLU_, Derivative
+
+def SoftMax():
+    """
+    Returns the Sortmax activation function and it's derivative
+    The shape of the input of the softmax function is (a, b)
+    With a the number of categories, and b the number of samples.
+    The softmax is applied to each sample.
+    """        
+    def SoftMax_(x):
+        exp = np.exp(x)
+        Z = np.sum(exp, axis = 0)[np.newaxis, :]
+        return exp/Z
+    
+    def Derivative(x, Fx):
+        # print(x.shape)
+        # print(Fx.shape)
+        out = -Fx[:, np.newaxis] * Fx[np.newaxis, :]
+        # print(out.shape)
+        diag = np.arange(Fx.shape[0])
+        out[diag, diag, :] += Fx
+        return out
+    
+    return SoftMax_, Derivative
