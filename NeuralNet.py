@@ -105,7 +105,11 @@ class Layer():
         #question: why does self.dF takes as input the variable called ``output"???????
         #imho it is only necessary to provide intermediate_sum as input to self.dF, but I might be wrong.
         #dCdB is basically a vector {\Delta_j^l}, with j being the running index
-        dCdB = self.dF(intermediate_sum, output)*dCdOUT
+        dOUTdB = self.dF(intermediate_sum, output)
+        if len(np.shape(dOUTdB)) == 1:
+            dCdB = dOUTdB*dCdOUT
+        else:
+            dCdB = dOUTdB@dCdOUT
         #use dCdB immediately to compute dC/dW
         dCdW = in_data[np.newaxis,:,:] * dCdB[:, np.newaxis, :]
 

@@ -62,3 +62,22 @@ def LeakyReLU(alpha):
         return np.where(x>0, 1, alpha)
     
     return LeakyReLU_, Derivative
+
+def SoftMax():
+    """
+    Returns the Sortmax activation function and it's derivative
+    The shape of the input of the softmax function is (a, b)
+    With a the number of categories, and b the number of samples.
+    The softmax is applied to each sample.
+    """        
+    def SoftMax_(x):
+        exp = np.exp(x)
+        Z = np.sum(exp, axis = 0)[np.newaxis, :]
+        return exp/Z
+    
+    def Derivative(x, Fx):
+        out = -Fx[:, np.newaxis] @ Fx[np.newaxis, :]
+        out += np.diag(Fx)
+        return Fx
+    
+    return SoftMax_, Derivative
