@@ -1,6 +1,7 @@
 import numpy as np
 import NeuralNet
-
+from numba import jit
+from numba.experimental import jitclass
 
 class Optimiser():
     """Base optimiser for Neural Nets
@@ -196,6 +197,7 @@ class AdamOptimiser ( AdaGradOptimiser ):
         #finally update powers of gamma1 and gamma2
         self.power_of_gammas*=self.power_of_gammas
 
+# @jitclass
 class LrScheduleOptimiser():
     
     def __init__(self, lr_func, optimiser) -> None:
