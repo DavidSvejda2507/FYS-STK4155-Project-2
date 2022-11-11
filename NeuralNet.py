@@ -33,6 +33,18 @@ class Model():
         return in_data
     
     def back_propagate(self, in_data, target, costFunc):
+        """Performs one back propagation step on the network
+
+        Args:
+            in_data (np.array): training data to be passed into the network, shape should be (a,b) where a is the siz of
+                                one input and b is the number of samples
+            target (np.array): Target output values for each of the inputs, the shape should be compatible with confFunc
+            costFunc ((predictions, targets) -> (cost, derivatives)): Function which computes the cost function
+                                and its derivatives with respect to the activations in the last layer.
+
+        Returns:
+            _type_: _description_
+        """        
         _, derivatives, Cost = self.layers[0].back_propagation(in_data, self.layers[1:], target, costFunc)
         derivatives.reverse()
         self.optimiser.update_model(derivatives)
@@ -73,8 +85,8 @@ class Layer():
             in_data (np.array): Input of the layer, should have shape (size of one input, number of inputs)
             layers (List of layers): List of layers that come after this one in the network
             target (np.array): Array of the desired outputs that costFunc can use to calculate the cost
-            costFunc (func(predictions, targets -> cost, derivatives)): Function which computes the cost function
-            and its derivatives with respect to the activations in the last layer.
+            costFunc ((predictions, targets) -> (cost, derivatives)): Function which computes the cost function
+                                and its derivatives with respect to the activations in the last layer.
 
         Returns:
             dCdIN: Derivatives of the cost function with respect to each of the inputs of the layer
