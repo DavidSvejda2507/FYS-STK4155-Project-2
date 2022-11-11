@@ -76,8 +76,12 @@ def SoftMax():
         return exp/Z
     
     def Derivative(x, Fx):
-        out = -Fx[:, np.newaxis] @ Fx[np.newaxis, :]
-        out += np.diag(Fx)
-        return Fx
+        # print(x.shape)
+        # print(Fx.shape)
+        out = -Fx[:, np.newaxis] * Fx[np.newaxis, :]
+        # print(out.shape)
+        diag = np.arange(Fx.shape[0])
+        out[diag, diag, :] += Fx
+        return out
     
     return SoftMax_, Derivative

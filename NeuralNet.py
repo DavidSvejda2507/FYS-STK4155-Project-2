@@ -106,10 +106,11 @@ class Layer():
         #imho it is only necessary to provide intermediate_sum as input to self.dF, but I might be wrong.
         #dCdB is basically a vector {\Delta_j^l}, with j being the running index
         dOUTdB = self.dF(intermediate_sum, output)
-        if len(np.shape(dOUTdB)) == 1:
+        if len(np.shape(dOUTdB)) == 2:
             dCdB = dOUTdB*dCdOUT
         else:
-            dCdB = dOUTdB@dCdOUT
+            dCdB = dOUTdB * dCdOUT[np.newaxis, :, :]
+            dCdB = np.sum(dCdB, axis = 1)
         #use dCdB immediately to compute dC/dW
         dCdW = in_data[np.newaxis,:,:] * dCdB[:, np.newaxis, :]
 
