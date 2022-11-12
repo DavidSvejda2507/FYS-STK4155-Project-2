@@ -1,9 +1,7 @@
 import numpy as np
-
-
+# from numba import jit
 
 class Model():
-
     def __init__(self, shapes, AFs, optimiser):
         """Make a neural network with randomised initial weights and biases.
 
@@ -50,9 +48,10 @@ class Model():
         self.optimiser.update_model(derivatives)
         return Cost.mean()
 
+# @jitclass
 class Layer():
 
-    def __init__(self, in_data, output, AF):
+    def __init__(self, in_data: int, output: int, AF):
         """Make a Neural Network layer, initializing weights and bias from random uniform distribution.
 
         Args:
@@ -93,7 +92,7 @@ class Layer():
             list_: List of the derivatives of all of the variables in this layer and the following layers
             Cost: Value of the cost function
         """
-        
+
         intermediate_sum = (self.W @ in_data) + self.B
         output = self.AF(intermediate_sum)
 
