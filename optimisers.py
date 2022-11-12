@@ -32,8 +32,12 @@ class Optimiser():
         if self.model is None:
             raise ValueError("No model has been set for optimiser")
         for dbeta, layer in zip(dbetas, self.model.layers):
-            layer.W -= dbeta[0] + self.lr * self.lamda * layer.W
-            layer.B -= dbeta[1] + self.lr * self.lamda * layer.B
+            layer.W -= dbeta[0]
+            layer.B -= dbeta[1]
+            
+    def add_regularisation(self, dbetas):
+        return [[dbeta[0] + self.lr * self.lamda * layer.W,
+                 dbeta[1] + self.lr * self.lamda * layer.B] for dbeta, layer in zip (dbetas, self.model.layers)]
     
     def compute_dbetas(self, derivatives):
         ''' compute the changes to the parameters to be made, here using plain gd.
@@ -44,7 +48,7 @@ class Optimiser():
         for derivative in derivatives:
             dbetas.append([  self.lr*derivative[0].mean(axis=2), self.lr*derivative[1].mean(axis=1)[:,np.newaxis]  ]  )
         
-        return dbetas
+        return self.add_regularisation(dbetas)
 
 
 
@@ -55,7 +59,6 @@ class MomentumOptimiser(Optimiser):
         self.velocity = None
         super().__init__(lr, lamda)
 
-    #do we really need this override if the function does the very same thing?? I comment it out 
     def set_model(self, model):
         super().set_model(model)
         #in this way, setting a new model will automatically set the velocities to zero.
@@ -81,10 +84,10 @@ class MomentumOptimiser(Optimiser):
     #     super().update(self.velocity)  
     # 
     def compute_dbetas(self, derivatives):
-        self.velocity = [ [self.carry * vel[0] + der[0].mean(axis = 2),
-                           self.carry * vel[1] + der[1].mean(axis = 1)[:,np.newaxis]]
+        self.velocity = [ [self.lr*(self.carry * vel[0] + der[0].mean(axis = 2)),
+                           self.lr*(self.carry * vel[1] + der[1].mean(axis = 1)[:,np.newaxis])]
                          for vel, der in zip(self.velocity, derivatives)]
-        return self.velocity
+        return self.add_regularisation(self.velocity)
 
 
 class AdaGradOptimiser( Optimiser ):
@@ -108,9 +111,9 @@ class AdaGradOptimiser( Optimiser ):
         #update G= sum of gradients squared
         self.update_G(derivatives)
         #first compute dbeta (at first step, self.G=0, so only need to update it after computaiton of dbeta)
-        dbeta = [[der[0].mean(axis = 2)              *self.lr/ (np.sqrt(Gsum[0])),
-                  der[1].mean(axis = 1)[:,np.newaxis]*self.lr/ (np.sqrt(Gsum[1])) ]
-        for Gsum, der in zip(self.G, derivatives)]
+        dbeta = [[(der[0].mean(axis = 2)               + self.lamda * layer.W)*self.lr/ (np.sqrt(Gsum[0])),
+                  (der[1].mean(axis = 1)[:,np.newaxis] + self.lamda * layer.B)*self.lr/ (np.sqrt(Gsum[1])) ]
+        for Gsum, der, layer in zip(self.G, derivatives, self.model.layers)]
         return dbeta
 
     def update_G(self, derivatives):

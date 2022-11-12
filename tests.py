@@ -77,11 +77,6 @@ def test_neural_net(optimiser):
         diff = (pred-correct)
         return diff**2, diff*2
     
-    
-    cost = 1e3
-    dcost = 1
-    count = 0
-    long_count = 0
     for i in range(5000):
             inputs = np.random.rand(2,1000)
             targets = func(inputs[0], inputs[1]) + np.random.normal(scale = 0.1, size = 1000)
@@ -111,11 +106,11 @@ if __name__ == "__main__":
     
     optimisers = [
         # Sigmoid Tests
-        # op.Optimiser(0.01, lamda = 2e-4),
+        # op.Optimiser(0.01, lamda = 1e-4),
         # op.AdaGradOptimiser(0.05, 1e-8, lamda = 1e-4),
-        # op.MomentumOptimiser(0.005, momentum = 1.5, lamda = 1e-4),
-        op.RMSPropOptimiser(0.01, 1e-8, 0.9),
-        op.AdamOptimiser(0.01, 1e-8, 0.9, 0.999, lamda = 1e-4)
+        op.MomentumOptimiser(0.01, momentum = 2, lamda = 1e-4),
+        # op.RMSPropOptimiser(0.01, 1e-8, 0.9),
+        # op.AdamOptimiser(0.01, 1e-8, 0.9, 0.999, lamda = 1e-4)
         
         # Softmax Tests
         # op.Optimiser(0.1, lamda = 2e-4),
