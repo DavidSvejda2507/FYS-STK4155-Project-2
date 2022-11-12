@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import NeuralNet as NN
 import optimisers as op
 import ActivationFunctions as AF
+import pandas as pd
 import Data
 
 ln10 = np.log(10)
@@ -38,6 +39,11 @@ def lr_ep_error(n_epochs, inputs, targets, test_data, test_targets, costFunc, mo
 
 def FixedLambda(L, lr_range, ep_range, data, targets, test_data, test_targets, costFunc, shapes, af, opt):
     min = 1e8
+    max = 0
+
+    lr_ep_Cross_ent = np.zeros((len(lr_range), len(ep_range)))
+    lr_ep_Acc = np.zeros((len(lr_range), len(ep_range)))
+
     for k, lr in enumerate(lr_range):
         print('.', end='', flush=True)
         for j, n_epoch in enumerate(ep_range):
@@ -48,14 +54,24 @@ def FixedLambda(L, lr_range, ep_range, data, targets, test_data, test_targets, c
 
             Acc, Cross_Ent = lr_ep_error(n_epoch, inputs, targets, test_data, test_targets, costFunc, model)
 
+            lr_ep_Cross_ent[k, j] = Cross_Ent
+            lr_ep_Acc[k, j] = Acc
+
+            if Acc>max:
+                max = Acc
+                acc_entropy = Cross_Ent
+                k_acc_min = k
+                j_acc_min = j
+
             if Cross_Ent<min:
                 min = Cross_Ent
-                final_acc = Acc
+                Cross_acc = Acc
                 k_min = k
                 j_min = j
+
     print('\n')
     #k = lr, j = epochs
-    return k_min, j_min, min, final_acc
+    return [k_min, j_min, min, Cross_acc, k_acc_min, j_acc_min, max, acc_entropy, lr_ep_Cross_ent, lr_ep_Cross_ent]
 
 def FixedLrEpoch(lr, n_epoch, l_range, data, targets, test_data, test_targets, costFunc, shapes, af, opt):
     min = 1e4
@@ -74,45 +90,22 @@ def FixedLrEpoch(lr, n_epoch, l_range, data, targets, test_data, test_targets, c
 
     return i_min
 
-def FindOpt(data, targets, test_data, test_targets, l_range, lr_range, ep_range, costFunc, af, opt):
-    min = 1e8
-    print('Fixed Lambda')
-    L = l_range[int(len(l_range)/2)]
-    k_min, j_min, min, final_acc = FixedLambda(L, lr_range, ep_range, data, targets, test_data, test_targets, costFunc, shapes, af, opt)
-    print('Fixed Lr Epoch')
-    i_min = FixedLrEpoch(lr_range[k_min], ep_range[j_min], l_range, data, targets, test_data, test_targets, costFunc, shapes, af, opt)
-    print('Fixed Lambda (2nd)')
-    k_min, j_min, min, final_acc = FixedLambda(l_range[i_min], lr_range, ep_range, data, targets, test_data, test_targets, costFunc, shapes, af, opt)
-    return i_min, k_min, j_min, min, final_acc
 
-def ZoomArray(array, index):
-    diff = abs(array[index]- array[index-1])
-    ret_array = np.arange(array[index]-diff, array[index]+diff, diff/len(array))
-    return ret_array
 
-def FindPlateau(data, targets, test_data, test_targets, cutoff, l_range, lr_range, ep_range, costFunc, af, opt):
-    dE = 1e8
-    # i = L, k = lr, j = epoch
-    i_min, k_min, j_min, min, final_acc = FindOpt(data, targets, test_data, test_targets, l_range, lr_range, ep_range, costFunc, af, opt)
-    while dE > cutoff:
-            NewRun = 'New Run'
-            print(f'{NewRun:-^20}')
-            l_range = ZoomArray(l_range, i_min)
-            lr_range = ZoomArray(lr_range, k_min)
-            ep_range = ZoomArray(ep_range, j_min)
-            i_min, k_min, j_min, min_new, acc_new = FindOpt(data, targets, test_data, test_targets, l_range, lr_range, ep_range, costFunc, af, opt)
-            dE = abs(min-min_new)
-            min = min_new
+def Run(L, lr_range, ep_range, data, targets, test_data, test_targets, costFunc, shapes, af, opt, name):
+    RL = FixedLambda(L, lr_range, ep_range, data, targets, test_data, test_targets, costFunc, shapes, af, opt)
+    print(f'Lr: {lr_range[RL[0]]} , Epochs: {ep_range[RL[1]]}')
+    Acc_Image = RL[-2]
+    Ent_Image = RL[-1]
+    Cols = [f'{num}' for num in ep_range]
+    Rows = [f'{num}' for num in lr_range]
+    Acc_df = pd.DataFrame(Acc_Image, columns=Cols, index=Rows)
+    Ent_df = pd.DataFrame(Ent_Image, columns=Cols, index=Rows)
+    Acc_df.to_csv(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Acc_{name}.txt')
+    Ent_df.to_csv(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Ent_{name}.txt')
 
-    # Found minimum, extracting values
-    L_min = l_range[i_min]
-    lr_min = lr_range[k_min]
-    ep_min = ep_range[j_min]
-
-    return L_min, lr_min, ep_min, min, acc_new
-
-[l_range, lr_range, ep_range] = [np.linspace(1, 10, 10), np.linspace(0, 10, 5), np.logspace(1, 3, 4)]
+L = 5
+[lr_range, ep_range] = [np.logspace(-4, 0, 10), np.logspace(2, 3, 10)]
 shapes = (64, 10)
 train, test, val, train_tar, test_tar, val_tar = Data.load_data()
-cutoff = 1e-2
-print(FindPlateau(train, train_tar, test, test_tar, cutoff, l_range, lr_range, ep_range, Cross_Entropy, AF.SoftMax(), op.MomentumOptimiser))
+Run(L, lr_range, ep_range, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), op.MomentumOptimiser, f'L_{L}')
