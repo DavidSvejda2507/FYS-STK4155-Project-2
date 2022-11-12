@@ -93,7 +93,7 @@ class Layer():
             list_: List of the derivatives of all of the variables in this layer and the following layers
             Cost: Value of the cost function
         """
-
+        
         intermediate_sum = (self.W @ in_data) + self.B
         output = self.AF(intermediate_sum)
 
@@ -102,6 +102,8 @@ class Layer():
         else:
             list_ = []
             Cost, dCdOUT = costFunc(output, target)
+
+
 
         #question: why does self.dF takes as input the variable called ``output"???????
         #imho it is only necessary to provide intermediate_sum as input to self.dF, but I might be wrong.
