@@ -28,7 +28,7 @@ class Optimiser():
         Raises:
             ValueError: If no medel has been set
         """
-        dbetas = self.compute_dbetas(derivatives)
+        dbetas = self.compute_dbetas(self.add_regularisation(derivatives))
         if self.model is None:
             raise ValueError("No model has been set for optimiser")
         for dbeta, layer in zip(dbetas, self.model.layers):
@@ -36,8 +36,9 @@ class Optimiser():
             layer.B -= dbeta[1]
             
     def add_regularisation(self, dbetas):
-        return [[dbeta[0] + self.lr * self.lamda * layer.W,
-                 dbeta[1] + self.lr * self.lamda * layer.B] for dbeta, layer in zip (dbetas, self.model.layers)]
+        return [[dbeta[0] + self.lamda * layer.W[:,:,np.newaxis],
+                 dbeta[1] + self.lamda * layer.B                 ] 
+                for dbeta, layer in zip (dbetas, self.model.layers)]
     
     def compute_dbetas(self, derivatives):
         ''' compute the changes to the parameters to be made, here using plain gd.
@@ -48,7 +49,7 @@ class Optimiser():
         for derivative in derivatives:
             dbetas.append([  self.lr*derivative[0].mean(axis=2), self.lr*derivative[1].mean(axis=1)[:,np.newaxis]  ]  )
         
-        return self.add_regularisation(dbetas)
+        return dbetas
 
 
 
@@ -87,7 +88,7 @@ class MomentumOptimiser(Optimiser):
         self.velocity = [ [self.lr*(self.carry * vel[0] + der[0].mean(axis = 2)),
                            self.lr*(self.carry * vel[1] + der[1].mean(axis = 1)[:,np.newaxis])]
                          for vel, der in zip(self.velocity, derivatives)]
-        return self.add_regularisation(self.velocity)
+        return self.velocity
 
 
 class AdaGradOptimiser( Optimiser ):
@@ -111,8 +112,8 @@ class AdaGradOptimiser( Optimiser ):
         #update G= sum of gradients squared
         self.update_G(derivatives)
         #first compute dbeta (at first step, self.G=0, so only need to update it after computaiton of dbeta)
-        dbeta = [[(der[0].mean(axis = 2)               + self.lamda * layer.W)*self.lr/ (np.sqrt(Gsum[0])),
-                  (der[1].mean(axis = 1)[:,np.newaxis] + self.lamda * layer.B)*self.lr/ (np.sqrt(Gsum[1])) ]
+        dbeta = [[der[0].mean(axis = 2)              *self.lr/ (np.sqrt(Gsum[0])),
+                  der[1].mean(axis = 1)[:,np.newaxis]*self.lr/ (np.sqrt(Gsum[1])) ]
         for Gsum, der, layer in zip(self.G, derivatives, self.model.layers)]
         return dbeta
 
