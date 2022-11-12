@@ -106,11 +106,11 @@ if __name__ == "__main__":
     
     optimisers = [
         # Sigmoid Tests
-        # op.Optimiser(0.01, lamda = 1e-4),
-        # op.AdaGradOptimiser(0.05, 1e-8, lamda = 1e-4),
+        op.Optimiser(0.01, lamda = 1e-4),
+        op.AdaGradOptimiser(0.05, 1e-8, lamda = 1e-4),
         op.MomentumOptimiser(0.01, momentum = 2, lamda = 1e-4),
-        # op.RMSPropOptimiser(0.01, 1e-8, 0.9),
-        # op.AdamOptimiser(0.01, 1e-8, 0.9, 0.999, lamda = 1e-4)
+        op.RMSPropOptimiser(0.01, 1e-8, 0.9),
+        op.AdamOptimiser(0.01, 1e-8, 0.9, 0.999, lamda = 1e-4)
         
         # Softmax Tests
         # op.Optimiser(0.1, lamda = 2e-4),
