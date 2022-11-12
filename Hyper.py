@@ -6,6 +6,7 @@ import ActivationFunctions as AF
 import pandas as pd
 import Data
 
+
 ln10 = np.log(10)
 
 def Accuracy(predictions, targets):
@@ -27,22 +28,30 @@ def Cross_Entropy(predictions, targets):
         i += 1
     return error, zeros
 
-def lr_ep_error(n_epochs, inputs, targets, test_data, test_targets, costFunc, model):
+def lr_ep_error(n_epochs, nr_batches, inputs, targets, test_data, test_targets, costFunc, model):
     epochs = 0
     while epochs <= n_epochs:
-        model.back_propagate(inputs, targets, costFunc)
+        batches = np.array_split(inputs, nr_batches, axis=1)
+        batches_targets = np.array_split(targets, nr_batches, axis=0)
+        for batch_nr in range(nr_batches):
+            rand_n = np.random.choice(range(nr_batches))
+            model.back_propagate(batches[rand_n], batches_targets[rand_n], costFunc)
         epochs += 1
     predictions = model.feed_forward(test_data)
     Acc = Accuracy(predictions.T, test_targets)[0].mean()
     Cross_Ent = Cross_Entropy(predictions, test_targets)[0].mean()
     return Acc, Cross_Ent
 
-def FixedLambda(L, lr_range, ep_range, data, targets, test_data, test_targets, costFunc, shapes, af, opt):
+def FixedLambda(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt):
     min = 1e8
     max = 0
 
-    lr_ep_Cross_ent = np.zeros((len(lr_range), len(ep_range)))
-    lr_ep_Acc = np.zeros((len(lr_range), len(ep_range)))
+    lr_ep_Cross_ent = np.zeros((len(lr_range)+1, len(ep_range)+1))
+    lr_ep_Acc = np.zeros((len(lr_range)+1, len(ep_range)+1))
+    lr_ep_Cross_ent[1:, 0] = lr_range
+    lr_ep_Cross_ent[0, 1:] = ep_range
+    lr_ep_Acc[1:, 0] = lr_range
+    lr_ep_Acc[0, 1:] = ep_range
 
     for k, lr in enumerate(lr_range):
         print('.', end='', flush=True)
@@ -52,10 +61,10 @@ def FixedLambda(L, lr_range, ep_range, data, targets, test_data, test_targets, c
 
             inputs = data
 
-            Acc, Cross_Ent = lr_ep_error(n_epoch, inputs, targets, test_data, test_targets, costFunc, model)
+            Acc, Cross_Ent = lr_ep_error(n_epoch, nr_batches, inputs, targets, test_data, test_targets, costFunc, model)
 
-            lr_ep_Cross_ent[k, j] = Cross_Ent
-            lr_ep_Acc[k, j] = Acc
+            lr_ep_Cross_ent[k+1, j+1] = Cross_Ent
+            lr_ep_Acc[k+1, j+1] = Acc
 
             if Acc>max:
                 max = Acc
@@ -73,7 +82,7 @@ def FixedLambda(L, lr_range, ep_range, data, targets, test_data, test_targets, c
     #k = lr, j = epochs
     return [k_min, j_min, min, Cross_acc, k_acc_min, j_acc_min, max, acc_entropy, lr_ep_Cross_ent, lr_ep_Cross_ent]
 
-def FixedLrEpoch(lr, n_epoch, l_range, data, targets, test_data, test_targets, costFunc, shapes, af, opt):
+def FixedLrEpoch(lr, n_epoch, l_range, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt):
     min = 1e4
     for i, L in enumerate(l_range):
         print('.', end='', flush=True)
@@ -81,7 +90,7 @@ def FixedLrEpoch(lr, n_epoch, l_range, data, targets, test_data, test_targets, c
 
         inputs = data
 
-        Acc, Cross_Ent = lr_ep_error(n_epoch, inputs, targets, test_data, test_targets, costFunc, model)
+        Acc, Cross_Ent = lr_ep_error(n_epoch, nr_batches, inputs, targets, test_data, test_targets, costFunc, model)
 
         if Cross_Ent<min:
             min = Cross_Ent
@@ -92,20 +101,18 @@ def FixedLrEpoch(lr, n_epoch, l_range, data, targets, test_data, test_targets, c
 
 
 
-def Run(L, lr_range, ep_range, data, targets, test_data, test_targets, costFunc, shapes, af, opt, name):
-    RL = FixedLambda(L, lr_range, ep_range, data, targets, test_data, test_targets, costFunc, shapes, af, opt)
-    print(f'Lr: {lr_range[RL[0]]} , Epochs: {ep_range[RL[1]]}')
+def Run(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt, name):
+    RL = FixedLambda(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt)
+    print(f'Momentum: {L}, Lr: {lr_range[RL[0]]} , Epochs: {ep_range[RL[1]]}')
     Acc_Image = RL[-2]
     Ent_Image = RL[-1]
-    Cols = [f'{num}' for num in ep_range]
-    Rows = [f'{num}' for num in lr_range]
-    Acc_df = pd.DataFrame(Acc_Image, columns=Cols, index=Rows)
-    Ent_df = pd.DataFrame(Ent_Image, columns=Cols, index=Rows)
-    Acc_df.to_csv(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Acc_{name}.txt')
-    Ent_df.to_csv(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Ent_{name}.txt')
+    np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Acc_{name}', Acc_Image)
+    np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Ent_{name}', Ent_Image)
 
-L = 5
-[lr_range, ep_range] = [np.logspace(-4, 0, 10), np.logspace(2, 3, 10)]
+
+L = 2
+[lr_range, ep_range] = [np.logspace(-4, 0, 5), np.logspace(1, 2, 5)]
 shapes = (64, 10)
 train, test, val, train_tar, test_tar, val_tar = Data.load_data()
-Run(L, lr_range, ep_range, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), op.MomentumOptimiser, f'L_{L}')
+name = f'L_{L}GridSize{len(lr_range)*len(ep_range)}'
+Run(L, lr_range, ep_range, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), op.MomentumOptimiser, name)
