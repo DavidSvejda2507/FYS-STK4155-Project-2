@@ -2,20 +2,20 @@ import numpy as np
 from numba import jit
 
 def Linear():
-    
+
     @jit(nopython=True)
     def Linear_(x: np.array) -> np.array:
         "Returns given value."
         return x
-    
+
     @jit(nopython=True)
     def Derivative(x: np.array, Fx: np.array) -> np.array:
         return 1
-    
+
     return Linear_, Derivative
 
 def Sigmoid():
-    
+
     @jit(nopython=True)
     def Sigmoid_(x: np.array) -> np.array:
         """
@@ -27,15 +27,15 @@ def Sigmoid():
         xexp = np.exp(x)
         out = xexp/(1+xexp)
         return out
-    
+
     @jit(nopython=True)
     def Derivative(x: np.array, Fx: np.array) -> np.array:
         return Fx * (1-Fx)
-    
+
     return Sigmoid_, Derivative
 
 def ReLU():
-    
+
     @jit(nopython=True)
     def ReLU_(x: np.array) -> np.array:
         """
@@ -45,15 +45,15 @@ def ReLU():
         Returns: a (float)
         """
         return np.where(x>0, x, 0)
-    
+
     @jit(nopython=True)
     def Derivative(x: np.array, Fx: np.array) -> np.array:
         return np.where(x>0, 1, 0)
-    
+
     return ReLU_, Derivative
 
 def LeakyReLU(alpha):
-    
+
     @jit(nopython=True)
     def LeakyReLU_(x: np.array) -> np.array:
         """
@@ -65,11 +65,11 @@ def LeakyReLU(alpha):
         Returns: a (float)
         """
         return np.where(x>0, x, alpha*x)
-    
+
     @jit(nopython=True)
     def Derivative(x: np.array, Fx: np.array) -> np.array:
         return np.where(x>0, 1, alpha)
-    
+
     return LeakyReLU_, Derivative
 
 def SoftMax():
@@ -84,7 +84,7 @@ def SoftMax():
         exp = np.exp(x)
         Z = np.sum(exp, axis = 0)
         return exp/Z
-    
+
     # @jit(nopython=True)
     def Derivative(x: np.array, Fx: np.array) -> np.array:
         out = -Fx[:, np.newaxis] * Fx[np.newaxis, :]
@@ -97,5 +97,5 @@ def SoftMax():
         # for i in range(out.shape[2]):
         #     out[:,:,i] += np.diag(Fx[:,i])
         # return out
-    
+
     return SoftMax_, Derivative

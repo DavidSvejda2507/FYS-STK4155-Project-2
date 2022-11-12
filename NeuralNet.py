@@ -16,7 +16,7 @@ class Model():
             self.layers.append(Layer(shapes[i], shapes[i+1], AFs[i]))
         self.optimiser = optimiser
         self.optimiser.set_model(self)
-    
+
     def feed_forward(self, in_data):
         """Feed the input through the network
 
@@ -25,11 +25,11 @@ class Model():
 
         Returns:
             np.array: Output data (output of last layer)
-        """        
+        """
         for layer in self.layers:
             in_data = layer.feed_forward(in_data)
         return in_data
-    
+
     def back_propagate(self, in_data, target, costFunc):
         """Performs one back propagation step on the network
 
@@ -42,15 +42,15 @@ class Model():
 
         Returns:
             _type_: _description_
-        """        
+        """
         _, derivatives, Cost = self.layers[0].back_propagation(in_data, self.layers[1:], target, costFunc)
         derivatives.reverse()
         self.optimiser.update_model(derivatives)
         return Cost.mean()
-    
+
 # @jitclass
 class Layer():
-    
+
     def __init__(self, in_data: int, output: int, AF):
         """Make a Neural Network layer, initializing weights and bias from random uniform distribution.
 
@@ -64,19 +64,19 @@ class Layer():
         #set the activation function and its derivative
         self.AF = AF[0]
         self.dF = AF[1]
-      
+
     def feed_forward(self, in_data):
         """Feed the input through the layer
 
         Args:
             in_data (np.array): Input data with shape (size of one input, number of inputs)
-        
+
         Returns:
             np.array: Output data (activations of all neurons in this layer)
         """
         z_data = (self.W @ in_data) + self.B
         return self.AF(z_data)
-    
+
     def back_propagation(self, in_data, layers, target, costFunc):
         """Feed the input forward and then propagate the derivative backward
 
@@ -91,16 +91,19 @@ class Layer():
             dCdIN: Derivatives of the cost function with respect to each of the inputs of the layer
             list_: List of the derivatives of all of the variables in this layer and the following layers
             Cost: Value of the cost function
-        """   
+        """
+
         intermediate_sum = (self.W @ in_data) + self.B
         output = self.AF(intermediate_sum)
-        
+
         if len(layers) > 0:
             dCdOUT, list_, Cost = layers[0].back_propagation(output, layers[1:], target, costFunc)
         else:
             list_ = []
             Cost, dCdOUT = costFunc(output, target)
-        
+
+
+
         #question: why does self.dF takes as input the variable called ``output"???????
         #imho it is only necessary to provide intermediate_sum as input to self.dF, but I might be wrong.
         #dCdB is basically a vector {\Delta_j^l}, with j being the running index
@@ -114,7 +117,7 @@ class Layer():
         dCdW = in_data[np.newaxis,:,:] * dCdB[:, np.newaxis, :]
 
         #np.tensordot made it hard for me to understand what is going on. I suggest changing to
-        # dCdIN = dCdB @ self.W 
+        # dCdIN = dCdB @ self.W
         #which should do the same job and looks a bit more readable.
         #dCdIn contains the derivative of the cost function with respect to the activations of the previous layer
         dCdIN = np.tensordot(self.W, dCdB, ((0,), (0,)))
