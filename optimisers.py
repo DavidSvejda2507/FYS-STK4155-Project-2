@@ -93,7 +93,7 @@ class MomentumOptimiser(Optimiser):
 
 class AdaGradOptimiser( Optimiser ):
 
-    def __init__( self, lr, epsilon, lamda=0):
+    def __init__( self, lr, epsilon=1e-8, lamda=0):
         #initialize learning rate using superclass
         super().__init__(lr, lamda)
         #self.G will contain sum of gradients^2
@@ -125,7 +125,7 @@ class AdaGradOptimiser( Optimiser ):
 
 class RMSPropOptimiser( AdaGradOptimiser ):
     #note I make a subclass of AdaGradOptimiser, cause the architecture looks very similar
-    def __init__(self, lr, epsilon, gamma, lamda=0):
+    def __init__(self, lr, epsilon=1e-8, gamma=0.9, lamda=0):
 
         super().__init__(lr, epsilon, lamda)
         self.gamma = gamma
