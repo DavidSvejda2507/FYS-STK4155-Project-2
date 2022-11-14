@@ -199,7 +199,7 @@ class AdamOptimiser ( AdaGradOptimiser ):
         self.M = Mlist
 
         #finally update powers of gamma1 and gamma2
-        self.power_of_gammas*=self.power_of_gammas
+        self.power_of_gammas*=np.array([self.gamma1, self.gamma2])[:,np.newaxis,np.newaxis]
 
 # @jitclass
 class LrScheduleOptimiser():
