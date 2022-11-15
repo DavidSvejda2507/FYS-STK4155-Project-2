@@ -136,8 +136,9 @@ def Run(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_target
     min = RL[2]
     max = RL[6]
     print(f't1: {t}, Lr: {lr_range[RL[0]]} , Epochs: {ep_range[RL[1]]}, Best Acc: {max}, Best CE: {min}')
-    np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Acc_{name}', Acc_Image)
-    np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Ent_{name}', Ent_Image)
+    if name:
+        np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Acc_{name}', Acc_Image)
+        np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Ent_{name}', Ent_Image)
 
 def RunLambda(L, lr, ep, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt, name, Lmd_range, t, schedule):
     RL = FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt, Lmd_range, schedule, t)
@@ -145,7 +146,8 @@ def RunLambda(L, lr, ep, nr_batches, data, targets, test_data, test_targets, cos
     min = RL[2]
     max = RL[4]
     print(f'Lmd: {Lmd_range[RL[0]]}, Best Acc: {max}, Best CE: {min}')
-    np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda/Acc_Ent', Acc_Ent_Image)
+    if name:
+        np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda/Acc_Ent', Acc_Ent_Image)
 
 def SendToLrEpoch():
     Llist = [0, 1.5, 0, 0, 0]
