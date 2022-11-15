@@ -6,18 +6,18 @@ from numba.experimental import jitclass
 class Optimiser():
     """Base optimiser for Neural Nets
     Any other optimiser should be subclass of this one, such that set_model(self, model) and update(self, derivatives) are callable
-    """    
-    
+    """
+
     def __init__(self, lr) -> None:
         self.lr = lr
         self.model = None
-    
+
     def set_model(self, model) -> None:
         if self.model is None:
             self.model = model
         else:
             raise ValueError("Model has already been set, Optimisers should not be reused")
-    
+
     def update_model(self, derivatives) -> None:
         """Do one step of gradient descent using the derivatives given by the model
 
@@ -33,12 +33,12 @@ class Optimiser():
         for dbeta, layer in zip(dbetas, self.model.layers):
             layer.W -= dbeta[0]
             layer.B -= dbeta[1]
-            
+
     # def add_regularisation(self, dbetas):
     #     return [[dbeta[0] + self.lamda * layer.W[:,:,np.newaxis],
-    #              dbeta[1] + self.lamda * layer.B                 ] 
+    #              dbeta[1] + self.lamda * layer.B                 ]
     #             for dbeta, layer in zip (dbetas, self.model.layers)]
-    
+
     def compute_dbetas(self, derivatives):
         ''' compute the changes to the parameters to be made, here using plain gd.
         input: derivatives is a list of lists, each of the kind [ dCdW , dCdB]
@@ -54,7 +54,7 @@ class Optimiser():
 
 
 class MomentumOptimiser(Optimiser):
-    
+
     def __init__(self, lr, momentum = 1) -> None:
         self.carry = 1. - 1./momentum
         self.velocity = None
@@ -130,11 +130,11 @@ class AdamOptimiser ( AdaGradOptimiser ):
         #need two parameters to update 1st and 2nd order moments of gradients
         self.gamma1 = gamma1
         self.gamma2 = gamma2
-        
+
         #need also the gamma1^t , gamma2^t with t= nr. of steps done. this attribute is updated
         #at every gd step together with self.M and self.G
         self.power_of_gammas =  np.array([gamma1, gamma2])[:,np.newaxis,np.newaxis]
-        
+
         #the first moment of the gradient
         self.M = None
 
@@ -142,7 +142,7 @@ class AdamOptimiser ( AdaGradOptimiser ):
 
         super().set_model(model)
         #also create space to store first order moment of gradient,
-        #initialized as zero. 
+        #initialized as zero.
         #note that self.G has been initialized with the right format in AdaGradOptimiser.set_model()
         self.M = self.G.copy()
 
@@ -166,7 +166,7 @@ class AdamOptimiser ( AdaGradOptimiser ):
                 mhat, ghat = self.hat(np.array( [m_single[ii], g_single[ii] ] ) )
                 tmplist.append(self.lr*mhat/(np.sqrt(ghat) + self.epsilon ) )
             dbetas.append( tmplist )
-        
+
         return dbetas
 
     def update_G( self, derivatives ):
@@ -182,7 +182,7 @@ class AdamOptimiser ( AdaGradOptimiser ):
             #because der is now a list containing the derivatives for many different training examples,
             #compute the mean over all training examples
             der_ = [der[0].mean(axis=2), der[1].mean(axis=1)[:,np.newaxis]]
-            
+
             for ii in range(2):
                 ##ii == 0 --> derivatives wrt weights, ii==1 --> derivatives wrt biases
                 der2_ = der_[ii]**2
@@ -198,16 +198,16 @@ class AdamOptimiser ( AdaGradOptimiser ):
 
 # @jitclass
 class LrScheduleOptimiser():
-    
+
     def __init__(self, lr_func, optimiser) -> None:
         self.lr_func = lr_func
         self.optimiser = optimiser
         self.count = 0
-    
+
     def set_model(self, model) -> None:
         self.optimiser.set_model(model)
-    
+
     def update_model(self, derivatives) -> None:
         self.count += 1
-        self.optimiser.lr = self.lr_func(self.count)        
+        self.optimiser.lr = self.lr_func(self.count)
         self.optimiser.update_model(derivatives)
