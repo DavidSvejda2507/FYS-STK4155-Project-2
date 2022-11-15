@@ -10,12 +10,28 @@ import lrSchedules as lrs
 ln10 = np.log(10)
 
 def Accuracy(predictions, targets):
+    """
+    Args
+
+    predictions : (10, n_images)
+    targets : (n_images, )
+
+    Returns: (n_images, ) with 1 for correct result and 0 for false, (n_images, ) with 2 for correct result and 0 for false (not used)
+    """
     numbers = np.arange(0, 10, 1)
     predicted_values = numbers[np.argmax(predictions, axis=1)]
     diff = np.equal(predicted_values, targets)
     return diff**2, diff*2
 
 def Cross_Entropy(predictions, targets):
+    """
+    Args
+
+    predictions : (10, n_images)
+    targets : (n_images, )
+
+    Returns: (n_images, ) with a values for how certain it is, (n_images, ) with derivative
+    """
     predictions = predictions.T
     expanded = np.expand_dims(targets, axis=1)
     predicted_values = np.reshape(np.take_along_axis(predictions, expanded, axis=1), (len(predictions), ))
@@ -149,21 +165,13 @@ def RunLambda(L, lr, ep, nr_batches, data, targets, test_data, test_targets, cos
     if name:
         np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda/Acc_Ent', Acc_Ent_Image)
 
-def SendToLrEpoch():
-    Llist = [0, 1.5, 0, 0, 0]
+def SendToLrEpoch(L, t1, schedule, opt):
     Lmd = 1e-4
     [lr_range, ep_range] = [np.logspace(-4, 0, 10), np.logspace(2, 3, 10)]
     shapes = (64, 10)
     train, test, val, train_tar, test_tar, val_tar = Data.load_data()
-    schedules = [lrs.hyperbolic_lr, lrs.hyperbolic_lr, None, None, None]
-    opts = [op.Optimiser, op.MomentumOptimiser, op.AdaGradOptimiser, op.AdamOptimiser, op.RMSPropOptimiser]
-    t1 = [215, 464, None, None, None]
-    for n_opt, opt in enumerate(opts):
-        L = Llist[n_opt]
-        schedule = schedules[n_opt]
-        t = t1[n_opt]
-        name = f't{t}hyperbolic'
-        Run(L, lr_range, ep_range, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), opt, name, Lmd, t, schedule)
+    name = 0
+    Run(L, lr_range, ep_range, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), opt, name, Lmd, t1, schedule)
 
 def SendToLambda(L, Lr, ep, t1, opt, schedule):
     Lmd_range = np.linspace(1e-5, 1e-3, 50)
