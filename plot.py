@@ -28,7 +28,7 @@ def plot_lr_epochs(filename: str, fig_name: str, fig_title: str):
     
     
 def plot_lamda(filename: str, fig_name: str, fig_title: str):
-    data = pd.read_csv(filename)
+    data = np.load(filename)
     
     fig, ax1 = plt.subplots(figsize=figsize)
     ax2 = ax1.twinx()
