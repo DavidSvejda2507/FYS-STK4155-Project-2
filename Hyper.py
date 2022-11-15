@@ -168,23 +168,9 @@ def SendToLrEpoch():
         name = f't{t}hyperbolic'
         Run(L, lr_range, ep_range, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), opt, name, Lmd, t, schedule)
 
-def SendToLambda():
-    Llist = [0, 1.5, 0, 0, 0]
-    Lrlist = [1, 1, 0.0003, 0.006, 0.1292]
-    epList = [278, 129, 129, 100, 129]
+def SendToLambda(L, Lr, ep, t1, opt, schedule):
     Lmd_range = np.linspace(1e-5, 1e-3, 50)
     shapes = (64, 10)
     train, test, val, train_tar, test_tar, val_tar = Data.load_data()
-    schedules = [lrs.hyperbolic_lr, lrs.hyperbolic_lr, None, None, None]
-    opts = [op.Optimiser, op.MomentumOptimiser, op.AdaGradOptimiser, op.AdamOptimiser, op.RMSPropOptimiser]
-    t1 = [215, 464, None, None, None]
-    for n_opt, opt in enumerate(opts):
-        L = Llist[n_opt]
-        schedule = schedules[n_opt]
-        t = t1[n_opt]
-        Lr = Lrlist[n_opt]
-        ep = epList[n_opt]
-        name = f't{t}hyperbolic'
-        RunLambda(L, Lr, ep, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), opt, name, Lmd_range, t, schedule)
-
-SendToLambda()
+    name = f't{t1}hyperbolic'
+    RunLambda(L, Lr, ep, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), opt, name, Lmd_range, t1, schedule)
