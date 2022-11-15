@@ -93,10 +93,10 @@ def FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, 
     min = 1e8
     max = 0
 
-    Lmd_Cross_ent = np.zeros(len(lr_range), 2)
-    Lmd_Acc = np.zeros(len(lr_range)+1, 2)
-    Lmd_Cross_ent[1:, 0] = l_range
-    Lmd_Acc[1:, 0] = l_range
+    Lmd_Cross_ent = np.zeros((len(Lmd_range)+1, 2))
+    Lmd_Acc = np.zeros((len(Lmd_range)+1, 2))
+    Lmd_Cross_ent[1:, 0] = Lmd_range
+    Lmd_Acc[1:, 0] = Lmd_range
 
     for i, Lmd in enumerate(Lmd_range):
         print('.', end='', flush=True)
@@ -111,7 +111,7 @@ def FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, 
             model = NN.Model(shapes, [af]*(len(shapes)-1), optimiser, lamda=Lmd)
         inputs = data
 
-        Acc, Cross_Ent = lr_ep_error(n_epoch, nr_batches, inputs, targets, test_data, test_targets, costFunc, model)
+        Acc, Cross_Ent = lr_ep_error(ep, nr_batches, inputs, targets, test_data, test_targets, costFunc, model)
 
         Lmd_Cross_ent[i, 1] = Cross_Ent
         Lmd__Acc[i, 1] = Acc
@@ -142,8 +142,8 @@ def Run(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_target
     np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Acc_{name}', Acc_Image)
     np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Ent_{name}', Ent_Image)
 
-def RunLambda(L, lr, ep, nr_batches, train, train_tar, test, test_tar, Cross_Entropy, shapes, af, opt, name, Lmd_range, t, schedule):
-    RL = FixedLrEpocha(L, lr, ep, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt, Lmd_range, schedule, t)
+def RunLambda(L, lr, ep, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt, name, Lmd_range, t, schedule):
+    RL = FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt, Lmd_range, schedule, t)
     Acc_Image = RL[-2]
     Ent_Image = RL[-1]
     min = RL[2]
@@ -185,6 +185,6 @@ def SendToLambda():
         Lr = Lrlist[n_opt]
         ep = epList[n_opt]
         name = f't{t}hyperbolic'
-        Run(L, lr, ep, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), opt, name, Lmd_range, t, schedule)
+        RunLambda(L, Lr, ep, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), opt, name, Lmd_range, t, schedule)
 
-SendToLrEpoch()
+SendToLambda()
