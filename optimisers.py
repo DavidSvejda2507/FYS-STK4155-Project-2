@@ -110,7 +110,7 @@ class AdaGradOptimiser( Optimiser ):
 class RMSPropOptimiser( AdaGradOptimiser ):
     #subclass of AdaGradOptimiser, because compute_dbetas is the same.
 
-    def __init__(self, lr, epsilon=1e-8, gamma=0.9, lamda=0):
+    def __init__(self, lr, epsilon=1e-8, gamma=0.9):
 
         super().__init__(lr, epsilon, lamda)
         #need extra parameter to weigh the second order moment of gradient.
@@ -126,7 +126,7 @@ class RMSPropOptimiser( AdaGradOptimiser ):
 
 class AdamOptimiser ( AdaGradOptimiser ):
 
-    def __init__(self, lr , epsilon=1e-8, gamma1=0.9, gamma2=0.999, lamda=0):
+    def __init__(self, lr , epsilon=1e-8, gamma1=0.9, gamma2=0.999):
         super().__init__(lr, epsilon, lamda)
         #need two parameters to update 1st and 2nd order moments of gradients
         self.gamma1 = gamma1
