@@ -30,27 +30,24 @@ def plot_lr_epochs(filename: str, fig_name: str, fig_title: str, savepath: str):
 
 
 
-def plot_lamda(filename: str, fig_name: str, fig_title: str, savepath: str):
+def plot_lamda(filename: str, fig_title: str, savepath: str):
     data = np.load(filename)
 
     fig, ax1 = plt.subplots(figsize=figsize)
     ax2 = ax1.twinx()
-    ax1.plot(data, "r--")
-    ax2.plot(data, "b--")
+    ax1.plot(data[:,0], data[:,1], "r--")
+    ax2.plot(data[:,0], data[:,2], "b--")
 
     ax1.set_xscale("log")
 
     ax1.set_xlabel("lambda")
-    ax1.set_ylabel("Cross Entropy")
-    ax2.set_ylabel("Accuracy")
+    ax1.set_ylabel("Accuracy")
+    ax2.set_ylabel("Cross Entropy")
 
-    fig.title(fig_title)
+    ax1.set_title(fig_title)
     fig.savefig(savepath)
     #fig.show()
 
 if __name__ == "__main__":
-    base = "Data/NrHidden0/"
-    for dir in os.listdir(base):
-        for dir2 in os.listdir(base + dir):
-            for name in os.listdir(base + dir + '/' + dir2):
-                plot_lr_epochs(f'{base}{dir}/{dir2}/{name}', dir2 + name + ".png", f"{dir}{name[:3]}", f"Data/Plots/{dir}{name[:3]}.png")
+    name = "Data/NrHidden0/AdamOptimiser/Lambda/Acc_Ent.npy"
+    plot_lamda(name, "Acc and Ent for Adam", "Data/Plots/NrHidden0/Adam_lambda.png")
