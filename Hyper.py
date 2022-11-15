@@ -93,10 +93,8 @@ def FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, 
     min = 1e8
     max = 0
 
-    Lmd_Cross_ent = np.zeros((len(Lmd_range)+1, 2))
-    Lmd_Acc = np.zeros((len(Lmd_range)+1, 2))
-    Lmd_Cross_ent[1:, 0] = Lmd_range
-    Lmd_Acc[1:, 0] = Lmd_range
+    Lmd_Acc_Cross_ent = np.zeros((len(Lmd_range), 3))
+    Lmd_Acc_Cross_ent[:, 0] = Lmd_range
 
     for i, Lmd in enumerate(Lmd_range):
         print('.', end='', flush=True)
@@ -113,8 +111,7 @@ def FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, 
 
         Acc, Cross_Ent = lr_ep_error(ep, nr_batches, inputs, targets, test_data, test_targets, costFunc, model)
 
-        Lmd_Cross_ent[i, 1] = Cross_Ent
-        Lmd_Acc[i, 1] = Acc
+        Lmd_Acc_Cross_ent[i, 1:2] = Acc, Cross_Ent
 
         if Acc>max:
             max = Acc
@@ -128,7 +125,7 @@ def FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, 
 
     print('\n')
     #k = lr, j = epochs
-    return [i_min, min, Cross_acc, i_acc_min, max, acc_entropy, Lmd_Acc, Lmd_Cross_ent]
+    return [i_min, min, Cross_acc, i_acc_min, max, acc_entropy, Lmd_Acc_Cross_ent]
 
 
 
@@ -144,13 +141,11 @@ def Run(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_target
 
 def RunLambda(L, lr, ep, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt, name, Lmd_range, t, schedule):
     RL = FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt, Lmd_range, schedule, t)
-    Acc_Image = RL[-2]
-    Ent_Image = RL[-1]
+    Acc_Ent_Image = RL[-1]
     min = RL[2]
     max = RL[4]
     print(f't1: {t}, Lmd: {Lmd_range[RL[0]]}, Best Acc: {max}, Best CE: {min}')
-    np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda/Acc_{name}', Acc_Image)
-    np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda/Ent_{name}', Ent_Image)
+    np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda/Acc_Ent', Acc_Ent_Image)
 
 def SendToLrEpoch():
     Llist = [0, 1.5, 0, 0, 0]
