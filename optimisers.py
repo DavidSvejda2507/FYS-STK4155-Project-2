@@ -11,6 +11,7 @@ class Optimiser():
     def __init__(self, lr) -> None:
         self.lr = lr
         self.model = None
+        self.name = "raw GD"
 
     def set_model(self, model) -> None:
         if self.model is None:
@@ -56,9 +57,11 @@ class Optimiser():
 class MomentumOptimiser(Optimiser):
 
     def __init__(self, lr, momentum = 1) -> None:
+        super().__init__(lr)
         self.carry = 1. - 1./momentum
         self.velocity = None
-        super().__init__(lr)
+        self.name = "Momentum GD"
+        
 
     def set_model(self, model):
         super().set_model(model)
@@ -81,6 +84,7 @@ class AdaGradOptimiser( Optimiser ):
         #self.G will contain sum of gradients^2
         self.G = None
         self.epsilon = epsilon
+        self.name = "AdaGrad"
 
     def set_model(self, model):
 
@@ -94,8 +98,11 @@ class AdaGradOptimiser( Optimiser ):
         #update G= sum of gradients squared
         self.update_G(derivatives)
         #first compute dbeta (at first step, self.G=0, so only need to update it after computaiton of dbeta)
-        dbeta = [[der[0].mean(axis = 2)              *self.lr/ (np.sqrt(Gsum[0]+self.epsilon)),
-                  der[1].mean(axis = 1)[:,np.newaxis]*self.lr/ (np.sqrt(Gsum[1]+self.epsilon)) ]
+
+        #note that the variables in Gsum are initialized as epsilon, so there is no need to add epsilon
+        #in the denominator of the following lines
+        dbeta = [[der[0].mean(axis = 2)              *self.lr/ (np.sqrt(Gsum[0])),
+                  der[1].mean(axis = 1)[:,np.newaxis]*self.lr/ (np.sqrt(Gsum[1])) ]
         for Gsum, der, layer in zip(self.G, derivatives, self.model.layers)]
         return dbeta
 
@@ -114,6 +121,7 @@ class RMSPropOptimiser( AdaGradOptimiser ):
         super().__init__(lr=lr, epsilon=epsilon)
         #need extra parameter to weigh the second order moment of gradient.
         self.gamma = gamma
+        self.name = "RMSProp"
 
     def update_G( self, derivatives):
         #the computation of d_beta is the very same as in adagrad, now the quantity G is updated differently.
@@ -130,6 +138,7 @@ class AdamOptimiser ( AdaGradOptimiser ):
         #need two parameters to update 1st and 2nd order moments of gradients
         self.gamma1 = gamma1
         self.gamma2 = gamma2
+        self.name = "Adam"
 
         #need also the gamma1^t , gamma2^t with t= nr. of steps done. this attribute is updated
         #at every gd step together with self.M and self.G
@@ -203,6 +212,7 @@ class LrScheduleOptimiser():
         self.lr_func = lr_func
         self.optimiser = optimiser
         self.count = 0
+        self.name = self.optimiser.name
 
     def set_model(self, model) -> None:
         self.optimiser.set_model(model)
