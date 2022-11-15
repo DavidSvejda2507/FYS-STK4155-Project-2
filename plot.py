@@ -35,19 +35,21 @@ def plot_lamda(filename: str, fig_title: str, savepath: str):
 
     fig, ax1 = plt.subplots(figsize=figsize)
     ax2 = ax1.twinx()
-    ax1.plot(data[:,0], data[:,1], "r--")
-    ax2.plot(data[:,0], data[:,2], "b--")
+    ax1.plot(data[:,0], data[:,1], "r--", label='Accuracy')
+    ax2.plot(data[:,0], data[:,2], "b--", label='Cross Entropy')
 
+    ax2.legend()
+    ax1.legend()
     ax1.set_xscale("log")
 
     ax1.set_xlabel("lambda")
     ax1.set_ylabel("Accuracy")
     ax2.set_ylabel("Cross Entropy")
-
+    plt.tight_layout()
     ax1.set_title(fig_title)
     fig.savefig(savepath)
     #fig.show()
 
 if __name__ == "__main__":
     name = "Data/NrHidden0/AdamOptimiser/Lambda/Acc_Ent.npy"
-    plot_lamda(name, "Acc and Ent for Adam", "Data/Plots/NrHidden0/Adam_lambda.png")
+    plot_lamda(name, "Acc and Ent for Adam", "Data/Plots/Adam_lambda.png")

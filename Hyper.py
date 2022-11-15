@@ -151,7 +151,7 @@ def Run(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_target
     Ent_Image = RL[-1]
     min = RL[2]
     max = RL[6]
-    print(f't1: {t}, Lr: {lr_range[RL[0]]} , Epochs: {ep_range[RL[1]]}, Best Acc: {max}, Best CE: {min}')
+    print(f'Lr: {lr_range[RL[0]]} , Epochs: {ep_range[RL[1]]}, Best Acc: {max}, Best CE: {min}')
     if name:
         np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Acc_{name}', Acc_Image)
         np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Ent_{name}', Ent_Image)
@@ -165,12 +165,9 @@ def RunLambda(L, lr, ep, nr_batches, data, targets, test_data, test_targets, cos
     if name:
         np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda/Acc_Ent', Acc_Ent_Image)
 
-def SendToLrEpoch(L, t1, schedule, opt):
-    Lmd = 1e-4
-    [lr_range, ep_range] = [np.logspace(-4, 0, 10), np.logspace(2, 3, 10)]
+def SendToLrEpoch(L, t1, schedule, opt, lr_range, ep_range, Lmd, name):
     shapes = (64, 10)
     train, test, val, train_tar, test_tar, val_tar = Data.load_data()
-    name = 0
     Run(L, lr_range, ep_range, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), opt, name, Lmd, t1, schedule)
 
 def SendToLambda(L, Lr, ep, t1, opt, schedule):
