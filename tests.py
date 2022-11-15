@@ -59,14 +59,14 @@ def test_gradient_descent():
         # plt.savefig("test.pdf")
 
 
-def test_neural_net(optimiser, lamda):
+def test_neural_net(optimiser, lamda = 1e-4):
     
     
     def lr_func(count):
         return 100/(10000+count)
     
     # model = NN.Model((2, 20, 1), [AF.ReLU()]*2, op.MomentumOptimiser(0.005, 3))
-    model = NN.Model((2, 20, 1), [AF.Sigmoid(), AF.Linear()], optimiser=optimiser)
+    model = NN.Model((2, 20, 1), [AF.Sigmoid(), AF.Linear()], optimiser=optimiser, lamda = lamda)
     # model = NN.Model((2, 20, 2), [AF.Sigmoid(), AF.SoftMax()], optimiser=optimiser)
     
     def func(x, y):
@@ -106,10 +106,10 @@ if __name__ == "__main__":
     
     optimisers = [
         # Sigmoid Tests
-        op.Optimiser(0.01),
+        # op.Optimiser(0.01),
         # op.AdaGradOptimiser(0.05, 1e-8, lamda = 1e-4),
         # op.MomentumOptimiser(0.01, momentum = 2, lamda = 1e-4),
-        # op.RMSPropOptimiser(0.01, 1e-8, 0.9),
+        op.RMSPropOptimiser(0.01, 1e-8),
         # op.AdamOptimiser(0.01, 1e-8, 0.9, 0.999, lamda = 1e-4)
         
         # Softmax Tests
