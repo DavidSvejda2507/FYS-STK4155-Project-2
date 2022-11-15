@@ -3,6 +3,8 @@ from warnings import warn
 
 
 
+
+
 def convergence_warning(grad, eta):
     """Issue a convergence warning
 

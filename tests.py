@@ -59,7 +59,7 @@ def test_gradient_descent():
         # plt.savefig("test.pdf")
 
 
-def test_neural_net(optimiser):
+def test_neural_net(optimiser, lamda):
     
     
     def lr_func(count):
@@ -102,15 +102,15 @@ def test_neural_net(optimiser):
     
 
 if __name__ == "__main__":
-    test_gradient_descent()
+    #test_gradient_descent()
     
     optimisers = [
         # Sigmoid Tests
-        op.Optimiser(0.01, lamda = 1e-4),
-        op.AdaGradOptimiser(0.05, 1e-8, lamda = 1e-4),
-        op.MomentumOptimiser(0.01, momentum = 2, lamda = 1e-4),
-        op.RMSPropOptimiser(0.01, 1e-8, 0.9),
-        op.AdamOptimiser(0.01, 1e-8, 0.9, 0.999, lamda = 1e-4)
+        op.Optimiser(0.01),
+        # op.AdaGradOptimiser(0.05, 1e-8, lamda = 1e-4),
+        # op.MomentumOptimiser(0.01, momentum = 2, lamda = 1e-4),
+        # op.RMSPropOptimiser(0.01, 1e-8, 0.9),
+        # op.AdamOptimiser(0.01, 1e-8, 0.9, 0.999, lamda = 1e-4)
         
         # Softmax Tests
         # op.Optimiser(0.1, lamda = 2e-4),
