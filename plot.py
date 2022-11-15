@@ -30,7 +30,7 @@ def plot_lr_epochs(filename: str, fig_name: str, fig_title: str, savepath: str):
 
 
 
-def plot_lamda(filename: str, fig_name: str, fig_title: str):
+def plot_lamda(filename: str, fig_name: str, fig_title: str, savepath: str):
     data = pd.read_csv(filename)
 
     fig, ax1 = plt.subplots(figsize=figsize)
@@ -45,8 +45,8 @@ def plot_lamda(filename: str, fig_name: str, fig_title: str):
     ax2.set_ylabel("Accuracy")
 
     fig.title(fig_title)
-    fig.savefig(fig_name)
-    fig.show()
+    fig.savefig(savepath)
+    #fig.show()
 
 if __name__ == "__main__":
     base = "Data/NrHidden0/"

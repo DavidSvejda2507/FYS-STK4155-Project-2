@@ -114,7 +114,7 @@ def FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, 
         Acc, Cross_Ent = lr_ep_error(ep, nr_batches, inputs, targets, test_data, test_targets, costFunc, model)
 
         Lmd_Cross_ent[i, 1] = Cross_Ent
-        Lmd__Acc[i, 1] = Acc
+        Lmd_Acc[i, 1] = Acc
 
         if Acc>max:
             max = Acc
@@ -172,7 +172,7 @@ def SendToLambda():
     Llist = [0, 1.5, 0, 0, 0]
     Lrlist = [1, 1, 0.0003, 0.006, 0.1292]
     epList = [278, 129, 129, 100, 129]
-    Lmd_range = np.linspace(0, 10, 100)
+    Lmd_range = np.linspace(1e-5, 1e-3, 50)
     shapes = (64, 10)
     train, test, val, train_tar, test_tar, val_tar = Data.load_data()
     schedules = [lrs.hyperbolic_lr, lrs.hyperbolic_lr, None, None, None]
