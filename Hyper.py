@@ -111,7 +111,7 @@ def FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, 
 
         Acc, Cross_Ent = lr_ep_error(ep, nr_batches, inputs, targets, test_data, test_targets, costFunc, model)
 
-        Lmd_Acc_Cross_ent[i, 1:2] = Acc, Cross_Ent
+        Lmd_Acc_Cross_ent[i, 1:3] = [Acc, Cross_Ent]
 
         if Acc>max:
             max = Acc
@@ -144,7 +144,7 @@ def RunLambda(L, lr, ep, nr_batches, data, targets, test_data, test_targets, cos
     Acc_Ent_Image = RL[-1]
     min = RL[2]
     max = RL[4]
-    print(f't1: {t}, Lmd: {Lmd_range[RL[0]]}, Best Acc: {max}, Best CE: {min}')
+    print(f'Lmd: {Lmd_range[RL[0]]}, Best Acc: {max}, Best CE: {min}')
     np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda/Acc_Ent', Acc_Ent_Image)
 
 def SendToLrEpoch():
