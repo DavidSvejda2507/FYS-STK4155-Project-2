@@ -126,7 +126,7 @@ class RMSPropOptimiser( AdaGradOptimiser ):
 class AdamOptimiser ( AdaGradOptimiser ):
 
     def __init__(self, lr , epsilon=1e-8, gamma1=0.9, gamma2=0.999):
-        super().__init__(lr, epsilon, lamda)
+        super().__init__(lr, epsilon)
         #need two parameters to update 1st and 2nd order moments of gradients
         self.gamma1 = gamma1
         self.gamma2 = gamma2
