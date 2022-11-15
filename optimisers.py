@@ -6,19 +6,19 @@ from numba.experimental import jitclass
 class Optimiser():
     """Base optimiser for Neural Nets
     Any other optimiser should be subclass of this one, such that set_model(self, model) and update(self, derivatives) are callable
-    """    
-    
+    """
+
     def __init__(self, lr, lamda = 0) -> None:
         self.lr = lr
         self.lamda = lamda
         self.model = None
-    
+
     def set_model(self, model) -> None:
         if self.model is None:
             self.model = model
         else:
             raise ValueError("Model has already been set, Optimisers should not be reused")
-    
+
     def update_model(self, derivatives) -> None:
         """Do one step of gradient descent using the derivatives given by the model
 
@@ -34,12 +34,12 @@ class Optimiser():
         for dbeta, layer in zip(dbetas, self.model.layers):
             layer.W -= dbeta[0]
             layer.B -= dbeta[1]
-            
+
     def add_regularisation(self, dbetas):
         return [[dbeta[0] + self.lamda * layer.W[:,:,np.newaxis],
-                 dbeta[1] + self.lamda * layer.B                 ] 
+                 dbeta[1] + self.lamda * layer.B                 ]
                 for dbeta, layer in zip (dbetas, self.model.layers)]
-    
+
     def compute_dbetas(self, derivatives):
         ''' compute the changes to the parameters to be made, here using plain gd.
         input: derivatives is a list of lists, each of the kind [ dCdW , dCdB]
@@ -48,13 +48,13 @@ class Optimiser():
         dbetas = []
         for derivative in derivatives:
             dbetas.append([  self.lr*derivative[0].mean(axis=2), self.lr*derivative[1].mean(axis=1)[:,np.newaxis]  ]  )
-        
+
         return dbetas
 
 
 
 class MomentumOptimiser(Optimiser):
-    
+
     def __init__(self, lr, momentum = 1, lamda = 0) -> None:
         self.carry = 1. - 1./momentum
         self.velocity = None
@@ -68,7 +68,7 @@ class MomentumOptimiser(Optimiser):
 
     ##note by gianmarco: commenting out old update version, now the update function changed its name
     ##to "update_model" and does not need to be
-    ##over ridden, the only thing which needs 
+    ##over ridden, the only thing which needs
 
     # def update(self, derivatives):
     #     #at the first step, simply compute gradient descent step using plain gradient.
@@ -78,12 +78,12 @@ class MomentumOptimiser(Optimiser):
     #     #at every step use momentum based gd to compute gd step.
     #     else:#####PROBLEM: THIS ELSE DOES NOT REALLY UPDATE ANYTHING(!?)
     #         for vel, der in zip(self.velocity, derivatives):
-    #             
+    #
 
-        
+
     #     #doubt about the following line: self.velocity at this point should be still be velocity before the else statement
-    #     super().update(self.velocity)  
-    # 
+    #     super().update(self.velocity)
+    #
     def compute_dbetas(self, derivatives):
         self.velocity = [ [self.lr*(self.carry * vel[0] + der[0].mean(axis = 2)),
                            self.lr*(self.carry * vel[1] + der[1].mean(axis = 1)[:,np.newaxis])]
@@ -125,7 +125,7 @@ class AdaGradOptimiser( Optimiser ):
 
 class RMSPropOptimiser( AdaGradOptimiser ):
     #note I make a subclass of AdaGradOptimiser, cause the architecture looks very similar
-    def __init__(self, lr, epsilon, gamma, lamda=0):
+    def __init__(self, lr, epsilon=1e-8, gamma=0.9, lamda=0):
 
         super().__init__(lr, epsilon, lamda)
         self.gamma = gamma
@@ -177,7 +177,7 @@ class AdamOptimiser ( AdaGradOptimiser ):
                 mhat, ghat = self.hat(np.array( [m_single[ii], g_single[ii] ] ) )
                 tmplist.append(self.lr*mhat/(np.sqrt(ghat) + self.epsilon ) )
             dbetas.append( tmplist )
-        
+
         return dbetas
 
     def update_G( self, derivatives ):
@@ -203,16 +203,16 @@ class AdamOptimiser ( AdaGradOptimiser ):
 
 # @jitclass
 class LrScheduleOptimiser():
-    
+
     def __init__(self, lr_func, optimiser) -> None:
         self.lr_func = lr_func
         self.optimiser = optimiser
         self.count = 0
-    
+
     def set_model(self, model) -> None:
         self.optimiser.set_model(model)
-    
+
     def update_model(self, derivatives) -> None:
         self.count += 1
-        self.optimiser.lr = self.lr_func(self.count)        
+        self.optimiser.lr = self.lr_func(self.count)
         self.optimiser.update_model(derivatives)
