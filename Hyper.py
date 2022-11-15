@@ -142,7 +142,7 @@ def Run(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_target
     np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Acc_{name}', Acc_Image)
     np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Ent_{name}', Ent_Image)
 
-def RunLambda(L, lr, ep, nr_batches, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), opt, name, Lmd_range, t, schedule):
+def RunLambda(L, lr, ep, nr_batches, train, train_tar, test, test_tar, Cross_Entropy, shapes, af, opt, name, Lmd_range, t, schedule):
     RL = FixedLrEpocha(L, lr, ep, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, af, opt, Lmd_range, schedule, t)
     Acc_Image = RL[-2]
     Ent_Image = RL[-1]
@@ -178,13 +178,13 @@ def SendToLambda():
     schedules = [lrs.hyperbolic_lr, lrs.hyperbolic_lr, None, None, None]
     opts = [op.Optimiser, op.MomentumOptimiser, op.AdaGradOptimiser, op.AdamOptimiser, op.RMSPropOptimiser]
     t1 = [215, 464, None, None, None]
-        for n_opt, opt in enumerate(opts):
-            L = Llist[n_opt]
-            schedule = schedules[n_opt]
-            t = t1[n_opt]
-            Lr = Lrlist[n_opt]
-            ep = epList[n_opt]
-            name = f't{t}hyperbolic'
-            Run(L, lr, ep, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), opt, name, Lmd_range, t, schedule)
+    for n_opt, opt in enumerate(opts):
+        L = Llist[n_opt]
+        schedule = schedules[n_opt]
+        t = t1[n_opt]
+        Lr = Lrlist[n_opt]
+        ep = epList[n_opt]
+        name = f't{t}hyperbolic'
+        Run(L, lr, ep, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, AF.SoftMax(), opt, name, Lmd_range, t, schedule)
 
 SendToLrEpoch()
