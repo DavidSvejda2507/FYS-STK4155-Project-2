@@ -10,7 +10,7 @@ class Optimiser():
 
     def __init__(self, lr, lamda = 0) -> None:
         self.lr = lr
-        self.lamda = lamda
+        #self.lamda = lamda
         self.model = None
 
     def set_model(self, model) -> None:
@@ -26,19 +26,19 @@ class Optimiser():
             derivatives (list of tuples of dCd_): Derivatives of all of the values in the model
 
         Raises:
-            ValueError: If no medel has been set
+            ValueError: If no model has been set
         """
-        dbetas = self.compute_dbetas(self.add_regularisation(derivatives))
+        dbetas = self.compute_dbetas(derivatives)
         if self.model is None:
             raise ValueError("No model has been set for optimiser")
         for dbeta, layer in zip(dbetas, self.model.layers):
             layer.W -= dbeta[0]
             layer.B -= dbeta[1]
 
-    def add_regularisation(self, dbetas):
-        return [[dbeta[0] + self.lamda * layer.W[:,:,np.newaxis],
-                 dbeta[1] + self.lamda * layer.B                 ]
-                for dbeta, layer in zip (dbetas, self.model.layers)]
+    # def add_regularisation(self, dbetas):
+    #     return [[dbeta[0] + self.lamda * layer.W[:,:,np.newaxis],
+    #              dbeta[1] + self.lamda * layer.B                 ]
+    #             for dbeta, layer in zip (dbetas, self.model.layers)]
 
     def compute_dbetas(self, derivatives):
         ''' compute the changes to the parameters to be made, here using plain gd.
@@ -93,7 +93,7 @@ class MomentumOptimiser(Optimiser):
 
 class AdaGradOptimiser( Optimiser ):
 
-    def __init__( self, lr, epsilon, lamda=0):
+    def __init__( self, lr, epsilon=1e-8, lamda=0):
         #initialize learning rate using superclass
         super().__init__(lr, lamda)
         #self.G will contain sum of gradients^2
@@ -118,16 +118,20 @@ class AdaGradOptimiser( Optimiser ):
         return dbeta
 
     def update_G(self, derivatives):
+        '''updates the quantity self.G by adding the square of the current gradient, contained in derivatives'''
+
         self.G = [[ G_single[0] + der[0].mean(axis=2)**2,
                     G_single[1] + der[1].mean(axis=1)[:,np.newaxis]**2 ]
                   for G_single, der in zip(self.G, derivatives)]
         return
 
 class RMSPropOptimiser( AdaGradOptimiser ):
-    #note I make a subclass of AdaGradOptimiser, cause the architecture looks very similar
+    #subclass of AdaGradOptimiser, cause compute_dbetas is the same.
+
     def __init__(self, lr, epsilon=1e-8, gamma=0.9, lamda=0):
 
         super().__init__(lr, epsilon, lamda)
+        #need extra parameter to weigh the second order moment of gradient.
         self.gamma = gamma
 
     def update_G( self, derivatives):
@@ -142,19 +146,23 @@ class AdamOptimiser ( AdaGradOptimiser ):
 
     def __init__(self, lr , epsilon=1e-8, gamma1=0.9, gamma2=0.999, lamda=0):
         super().__init__(lr, epsilon, lamda)
-        #now need two parameters to update 1st and 2nd order moments of gradients
+        #need two parameters to update 1st and 2nd order moments of gradients
         self.gamma1 = gamma1
         self.gamma2 = gamma2
-        #need also the gamma1^t , gamma2^t with t= nr. of steps done.
+
+        #need also the gamma1^t , gamma2^t with t= nr. of steps done. this attribute is updated
+        #at every gd step together with self.M and self.G
         self.power_of_gammas =  np.array([gamma1, gamma2])[:,np.newaxis,np.newaxis]
-        #here I will store the first moment of the gradient
+
+        #the first moment of the gradient
         self.M = None
 
     def set_model(self, model):
 
         super().set_model(model)
         #also create space to store first order moment of gradient,
-        #initialized as zero. This class is subclass of AdaGradOptimiser, so self.G has been already properly initialized
+        #initialized as zero.
+        #note that self.G has been initialized with the right format in AdaGradOptimiser.set_model()
         self.M = self.G.copy()
 
     def hat(self, x):
@@ -181,15 +189,21 @@ class AdamOptimiser ( AdaGradOptimiser ):
         return dbetas
 
     def update_G( self, derivatives ):
-        '''update G, M and powers of gamma1 and gamma2.'''
+        '''NOTE: Despite the name, this function updates G, M and powers of gamma1 and gamma2.'''
 
         Glist = []
         Mlist = []
+
         for m_single, g_single, der in zip(self.M, self.G, derivatives):
             tmplist_m = []
             tmplist_g = []
+
+            #because der is now a list containing the derivatives for many different training examples,
+            #compute the mean over all training examples
             der_ = [der[0].mean(axis=2), der[1].mean(axis=1)[:,np.newaxis]]
+
             for ii in range(2):
+                ##ii == 0 --> derivatives wrt weights, ii==1 --> derivatives wrt biases
                 der2_ = der_[ii]**2
                 tmplist_m.append(self.gamma1*m_single[ii] + (1-self.gamma1)*der_[ii])
                 tmplist_g.append(self.gamma2*g_single[ii] + (1-self.gamma2)*der2_ )
@@ -199,7 +213,7 @@ class AdamOptimiser ( AdaGradOptimiser ):
         self.M = Mlist
 
         #finally update powers of gamma1 and gamma2
-        self.power_of_gammas*=self.power_of_gammas
+        self.power_of_gammas*=np.array([self.gamma1, self.gamma2])[:,np.newaxis,np.newaxis]
 
 # @jitclass
 class LrScheduleOptimiser():
