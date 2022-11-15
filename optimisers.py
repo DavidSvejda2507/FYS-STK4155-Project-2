@@ -8,7 +8,7 @@ class Optimiser():
     Any other optimiser should be subclass of this one, such that set_model(self, model) and update(self, derivatives) are callable
     """    
     
-    def __init__(self, lr, lamda = 0) -> None:
+    def __init__(self, lr) -> None:
         self.lr = lr
         self.lamda = lamda
         self.model = None
@@ -55,7 +55,7 @@ class Optimiser():
 
 class MomentumOptimiser(Optimiser):
     
-    def __init__(self, lr, momentum = 1, lamda = 0) -> None:
+    def __init__(self, lr, momentum = 1) -> None:
         self.carry = 1. - 1./momentum
         self.velocity = None
         super().__init__(lr, lamda)
@@ -93,9 +93,9 @@ class MomentumOptimiser(Optimiser):
 
 class AdaGradOptimiser( Optimiser ):
 
-    def __init__( self, lr, epsilon=1e-8, lamda=0):
+    def __init__( self, lr, epsilon=1e-8):
         #initialize learning rate using superclass
-        super().__init__(lr, lamda)
+        super().__init__(lr)
         #self.G will contain sum of gradients^2
         self.G = None
         self.epsilon = epsilon
