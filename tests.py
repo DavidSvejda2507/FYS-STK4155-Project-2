@@ -66,12 +66,12 @@ def test_neural_net(optimiser, lamda = 1e-4):
         return 100/(10000+count)
     
     # model = NN.Model((2, 20, 1), [AF.ReLU()]*2, op.MomentumOptimiser(0.005, 3))
-    model = NN.Model((2, 20, 1), [AF.Sigmoid(), AF.Linear()], optimiser=optimiser, lamda = lamda)
-    # model = NN.Model((2, 20, 2), [AF.Sigmoid(), AF.SoftMax()], optimiser=optimiser)
+    # model = NN.Model((2, 20, 1), [AF.Sigmoid(), AF.Linear()], optimiser=optimiser, lamda = lamda)
+    model = NN.Model((2, 20, 2), [AF.Sigmoid(), AF.SoftMax()], optimiser=optimiser, lamda=1e-4)
     
     def func(x, y):
-        return np.exp(-(x*x+y*y))
-        # return np.stack([np.exp(-(x*x+y*y)), 1-np.exp(-(x*x+y*y))], axis = 0)
+        # return np.exp(-(x*x+y*y))
+        return np.stack([np.exp(-(x*x+y*y)), 1-np.exp(-(x*x+y*y))], axis = 0)
     
     def costFunc(pred, correct):
         diff = (pred-correct)
@@ -106,10 +106,10 @@ if __name__ == "__main__":
     
     optimisers = [
         # Sigmoid Tests
-        # op.Optimiser(0.01),
+        op.Optimiser(0.01),
         # op.AdaGradOptimiser(0.05, 1e-8, lamda = 1e-4),
         # op.MomentumOptimiser(0.01, momentum = 2, lamda = 1e-4),
-        op.RMSPropOptimiser(0.01, 1e-8),
+        # op.RMSPropOptimiser(0.01, 1e-8),
         # op.AdamOptimiser(0.01, 1e-8, 0.9, 0.999, lamda = 1e-4)
         
         # Softmax Tests
