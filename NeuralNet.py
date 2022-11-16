@@ -60,8 +60,8 @@ class Layer():
             output (int): size of the layer
             AF ((func(np.array -> np.array)), derivative): Activation function
         """
-        self.W = np.random.rand(output, in_data)
-        self.B = np.random.rand(output, 1)
+        self.W = np.random.normal(0,1,(output, in_data))
+        self.B = np.random.random((output, 1))
         #set the activation function and its derivative
         self.AF = AF[0]
         self.dF = AF[1]
