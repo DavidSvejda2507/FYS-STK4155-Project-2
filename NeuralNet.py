@@ -61,7 +61,7 @@ class Layer():
             AF ((func(np.array -> np.array)), derivative): Activation function
         """
         self.W = np.random.normal(0,1,(output, in_data))
-        self.B = np.random.normal(0,1,(output, 1))
+        self.B = np.random.random((output, 1))
         #set the activation function and its derivative
         self.AF = AF[0]
         self.dF = AF[1]

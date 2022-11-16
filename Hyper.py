@@ -6,6 +6,7 @@ import ActivationFunctions as AF
 import pandas as pd
 import Data
 import lrSchedules as lrs
+import os
 
 ln10 = np.log(10)
 
@@ -32,11 +33,15 @@ def Cross_Entropy(predictions, targets):
 
     Returns: (n_images, ) with a values for how certain it is, (n_images, ) with derivative
     """
+    # print(predictions)
     predictions = predictions.T
     expanded = np.expand_dims(targets, axis=1)
     predicted_values = np.reshape(np.take_along_axis(predictions, expanded, axis=1), (len(predictions), ))
+    # print(predicted_values)
     error = -np.log10(abs(predicted_values)+1e-8)
+    # print(error)
     derror = -1/(abs(predicted_values*ln10)+1e-8)
+    # print(derror)
     zeros = np.zeros((10, len(predicted_values)))
     i = 0
     for k, j in zip(derror, targets):
@@ -55,7 +60,7 @@ def lr_ep_error(n_epochs, nr_batches, inputs, targets, test_data, test_targets, 
         epochs += 1
     predictions = model.feed_forward(test_data)
     Acc = Accuracy(predictions.T, test_targets)[0].mean()
-    print(predictions)
+    # print(predictions)
     Cross_Ent = Cross_Entropy(predictions, test_targets)[0].mean()
     return Acc, Cross_Ent
 
@@ -79,7 +84,7 @@ def FixedLambda(L, lr_range, ep_range, nr_batches, data, targets, test_data, tes
             else:
                 optimiser = opt(lr)
 
-            print(afs)
+            # print(afs)
             if schedule:
                 model = NN.Model(shapes, afs, op.LrScheduleOptimiser(schedule(lr, t), optimiser), lamda=Lmd)
             else:
@@ -97,7 +102,7 @@ def FixedLambda(L, lr_range, ep_range, nr_batches, data, targets, test_data, tes
                 k_acc_min = k
                 j_acc_min = j
 
-            print(Cross_Ent)
+            # print(Cross_Ent)
             
             if Cross_Ent<min:
                 min = Cross_Ent
@@ -157,6 +162,7 @@ def Run(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_target
     max = RL[6]
     print(f'Lr: {lr_range[RL[0]]} , Epochs: {ep_range[RL[1]]}, Best Acc: {max}, Best CE: {min}')
     if name:
+        os.makedirs(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch', exist_ok = True)
         np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Acc_{name}', Acc_Image)
         np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Ent_{name}', Ent_Image)
 
@@ -167,6 +173,7 @@ def RunLambda(L, lr, ep, nr_batches, data, targets, test_data, test_targets, cos
     max = RL[4]
     print(f'Lmd: {Lmd_range[RL[0]]}, Best Acc: {max}, Best CE: {min}')
     if name:
+        np.makedirs(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda', exist_ok = True)
         np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda/Acc_Ent', Acc_Ent_Image)
 
 def SendToLrEpoch(L, t1, schedule, opt, lr_range, ep_range, Lmd, name):
