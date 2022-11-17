@@ -198,7 +198,7 @@ def NetworkToLrEpoch(L, t1, schedule, opt, lr_range, ep_range, Lmd, name, af, sh
         shapes, [af]*(len(shapes)-2) + [AF.SoftMax()], opt, name, Lmd, t1, schedule)
 
 def NetworkToLambda(L, Lr, ep, t1, opt, schedule, af, shapes):
-    Lmd_range = np.logspace(-5, -3, 5)
+    Lmd_range = np.logspace(-5, -3, 50)
     train, test, _, train_tar, test_tar, _ = Data.load_data()
     RunLambda(L, Lr, ep, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes,
               [af]*(len(shapes)-2)+[AF.SoftMax()], opt, Lmd_range, t1, schedule)
