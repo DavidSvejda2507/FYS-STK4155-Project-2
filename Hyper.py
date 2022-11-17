@@ -73,10 +73,10 @@ def FixedLambda(L, lr_range, ep_range, nr_batches, data, targets, test_data, tes
 
     batches = np.array_split(data, nr_batches, axis=1)
     batches_targets = np.array_split(targets, nr_batches, axis=0)
-    
+
     for k, lr in enumerate(lr_range):
         print('.', end='', flush=True)
-        
+
         if L:
             optimiser = opt(lr, momentum=L)
         else:
@@ -84,10 +84,10 @@ def FixedLambda(L, lr_range, ep_range, nr_batches, data, targets, test_data, tes
 
         if schedule:
             optimiser = op.LrScheduleOptimiser(schedule(lr, t), optimiser)
-            
+
         model = NN.Model(shapes, afs, optimiser, lamda=Lmd)
         epochs = 0
-            
+
         for j, n_epochs in enumerate(ep_range):
             print(',', end='', flush=True)
 
@@ -108,7 +108,7 @@ def FixedLambda(L, lr_range, ep_range, nr_batches, data, targets, test_data, tes
                 acc_entropy = Cross_Ent
                 k_acc_min = k
                 j_acc_min = j
-            
+
             if Cross_Ent<min:
                 min = Cross_Ent
                 Cross_acc = Acc
@@ -146,7 +146,7 @@ def FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, 
             max = Acc
             acc_entropy = Cross_Ent
             i_acc_min = i
-        
+
         if Cross_Ent<min:
             min = Cross_Ent
             Cross_acc = Acc
@@ -191,7 +191,7 @@ def SendToLambda(L, Lr, ep, t1, opt, schedule):
     train, test, _, train_tar, test_tar, _ = Data.load_data()
     RunLambda(L, Lr, ep, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes,
               [AF.SoftMax()], opt, Lmd_range, t1, schedule)
-    
+
 def NetworkToLrEpoch(L, t1, schedule, opt, lr_range, ep_range, Lmd, name, af, shapes):
     train, test, _, train_tar, test_tar, _ = Data.load_data()
     Run(L, lr_range, ep_range, 22, train, train_tar, test, test_tar, Cross_Entropy,
