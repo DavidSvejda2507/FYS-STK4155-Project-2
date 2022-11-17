@@ -103,7 +103,7 @@ def FixedLambda(L, lr_range, ep_range, nr_batches, data, targets, test_data, tes
                 j_acc_min = j
 
             # print(Cross_Ent)
-            
+
             if Cross_Ent<min:
                 min = Cross_Ent
                 Cross_acc = Acc
@@ -142,7 +142,7 @@ def FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, 
             max = Acc
             acc_entropy = Cross_Ent
             i_acc_min = i
-        
+
         if Cross_Ent<min:
             min = Cross_Ent
             Cross_acc = Acc
@@ -173,7 +173,7 @@ def RunLambda(L, lr, ep, nr_batches, data, targets, test_data, test_targets, cos
     max = RL[4]
     print(f'Lmd: {Lmd_range[RL[0]]}, Best Acc: {max}, Best CE: {min}')
     if name:
-        np.makedirs(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda', exist_ok = True)
+        os.makedirs(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda', exist_ok = True)
         np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda/Acc_Ent', Acc_Ent_Image)
 
 def SendToLrEpoch(L, t1, schedule, opt, lr_range, ep_range, Lmd, name):
@@ -187,7 +187,7 @@ def SendToLambda(L, Lr, ep, t1, opt, schedule):
     train, test, _, train_tar, test_tar, _ = Data.load_data()
     name = f't{t1}hyperbolic'
     RunLambda(L, Lr, ep, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, [AF.SoftMax()], opt, name, Lmd_range, t1, schedule)
-    
+
 def NetworkToLrEpoch(L, t1, schedule, opt, lr_range, ep_range, Lmd, name, af, shapes):
     train, test, _, train_tar, test_tar, _ = Data.load_data()
     Run(L, lr_range, ep_range, 22, train, train_tar, test, test_tar, Cross_Entropy, shapes, [af]*(len(shapes)-2) + [AF.SoftMax()], opt, name, Lmd, t1, schedule)
