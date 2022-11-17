@@ -12,11 +12,19 @@ import copy
 
 def validate(n_epochs, optimisers, opt_names, Lmds, afs, shape, name):
     """
+
+    Trains each optimiser 5 times with given parameters. Takes the average of
+    the accuracies and cross entropies and the standard deviation for each of them,
+    then plots both the accuracy and cross entropy in a errorbar plot.
+
+    Args:
+
     optimisers: initialized optimisers [opt1, opt2, ...]
     opt_names: optimiser names used for x_ticks in plot
     Lmds: lambda, regularisation parameter for each optimiser
     afs: activation function for layer other then the output layer in the form: [af]
     name: filename for savefig
+
     """
     times = 5 #Number of times initializing and training the same model
     AccEntMeanErr = np.zeros((2, len(optimisers), 2))

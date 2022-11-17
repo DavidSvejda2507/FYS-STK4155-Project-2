@@ -11,7 +11,9 @@ import os
 
 
 def weights_heat(n_epochs, optimiser, Lmd, afs, shape, name, grid_shape):
-
+    """
+    Plots a heatmap of the weights for each node in the first layer after the input layer.
+    """
     model = NN.Model(shape, afs, optimiser, lamda=Lmd)
     train, test, _, train_tar, test_tar, _ = Data.load_data()
     batches = np.array_split(train, 22, axis=1)

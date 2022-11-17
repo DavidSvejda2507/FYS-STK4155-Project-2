@@ -46,6 +46,11 @@ def Cross_Entropy(predictions, targets):
     return error, zeros
 
 def lr_ep_error(n_epochs, nr_batches, inputs, targets, test_data, test_targets, costFunc, model):
+    """
+    Trains the model for a given number of epochs
+    and returns the accuracy and cross entropy values
+
+    """
     epochs = 0
     while epochs <= n_epochs:
         batches = np.array_split(inputs, nr_batches, axis=1)
@@ -61,6 +66,31 @@ def lr_ep_error(n_epochs, nr_batches, inputs, targets, test_data, test_targets, 
     return Acc, Cross_Ent
 
 def FixedLambda(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, afs, opt, Lmd, schedule, t):
+    """
+    For a given lambda it iterates over the learning rates and
+    number of epochs and calculates the accuracy and cross entropy.
+
+    Args:
+
+    L: Momentum of the model (0 or False for no momentum)
+    lr_range: The different learning rates to use
+    ep_range: The different number og epochs to use
+    ...
+
+    Return:
+
+    k_min: the lr_range index for lowest cross entropy
+    j_min: the ep_range index for lowest cross entropy
+    min: Minumum cross entropy found
+    Cross_acc: The accuracy at the lowest corss entropy
+    k_acc_min: the lr_range index for highest accuracy
+    j_acc_min: the ep_range index for highest accuracy
+    max: The highest accuracy
+    acc_entropy: The cross entropy at the highest accuracy
+
+    lr_ep_Acc: 2D array of all accuracies for the different learning rates and number of epochs
+    lr_ep_Cross_ent: 2D array of all cross entropies for the different learning rates and number of epochs
+    """
     min = 1e8
     max = 0
 
@@ -119,6 +149,30 @@ def FixedLambda(L, lr_range, ep_range, nr_batches, data, targets, test_data, tes
     return [k_min, j_min, min, Cross_acc, k_acc_min, j_acc_min, max, acc_entropy, lr_ep_Acc, lr_ep_Cross_ent]
 
 def FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, afs, opt, Lmd_range, schedule, t):
+
+    """
+    For a given lambda it iterates over the learning rates and
+    number of epochs and calculates the accuracy and cross entropy.
+
+    Args:
+
+    L: Momentum of the model (0 or False for no momentum)
+    lr: the learning rate
+    ep: the number of epochs
+    ...
+    Lmd_range: the different lambdas to use
+    Return:
+
+    i_min: the Lmd_range index for lowest cross entropy
+    min: Minumum cross entropy found
+    Cross_acc: The accuracy at the lowest cross entropy
+    i_acc_min: the ep_range index for highest accuracy
+    max: The highest accuracy
+    acc_entropy: The cross entropy at the highest accuracy
+
+    Lmd_Acc_Cross_ent: array with [[Lmd_range], [accuracies], [cross entropies]]
+    """
+
     min = 1e8
     max = 0
 
@@ -159,6 +213,9 @@ def FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, 
 
 
 def Run(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, afs, opt, name, Lmd, t, schedule):
+    """
+    Takes the parameters for FixedLambda, sends them to the function, and saves the arrays to a file each.
+    """
     RL = FixedLambda(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, afs, opt, Lmd, schedule, t)
     Acc_Image = RL[-2]
     Ent_Image = RL[-1]
@@ -171,6 +228,9 @@ def Run(L, lr_range, ep_range, nr_batches, data, targets, test_data, test_target
         np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/LrEpoch/Ent_{name}', Ent_Image)
 
 def RunLambda(L, lr, ep, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, afs, opt, Lmd_range, t, schedule):
+    """
+    Takes the parameters for FixedLrEpoch, sends them to the function, and saves the array to a file each.
+    """
     RL = FixedLrEpoch(L, lr, ep, nr_batches, data, targets, test_data, test_targets, costFunc, shapes, afs, opt, Lmd_range, schedule, t)
     Acc_Ent_Image = RL[-1]
     min = RL[2]
@@ -180,12 +240,18 @@ def RunLambda(L, lr, ep, nr_batches, data, targets, test_data, test_targets, cos
     np.save(f'./Data/NrHidden{len(shapes)-2}/{opt.__name__}/Lambda/Acc_Ent', Acc_Ent_Image)
 
 def SendToLrEpoch(L, t1, schedule, opt, lr_range, ep_range, Lmd, name):
+    """
+    Collection of often used variables to send to Run, which sends it to FixedLambda
+    """
     shapes = (64, 10)
     train, test, _, train_tar, test_tar, _ = Data.load_data()
     Run(L, lr_range, ep_range, 22, train, train_tar, test, test_tar, Cross_Entropy,
         shapes, [AF.SoftMax()], opt, name, Lmd, t1, schedule)
 
 def SendToLambda(L, Lr, ep, t1, opt, schedule):
+    """
+    Collection of often used variables to send to RunLambda, which sends it to FixedLrEpoch
+    """
     Lmd_range = np.logspace(-5, -3, 50)
     shapes = (64, 10)
     train, test, _, train_tar, test_tar, _ = Data.load_data()
