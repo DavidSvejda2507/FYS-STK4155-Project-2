@@ -53,6 +53,8 @@ def validate(n_epochs, optimisers, opt_names, Lmds, afs, shape, name):
 
         AccEntMeanErr[0, k, :] = np.mean(ValAccEnt[:, 0]), np.std(ValAccEnt[:, 0])
         AccEntMeanErr[1, k, :] = np.mean(ValAccEnt[:, 1]), np.std(ValAccEnt[:, 1])
+        print(f'Optimiser: {opt_names[k]}, Mean Accuracy: {AccEntMeanErr[0, k, 0]}, Std: {AccEntMeanErr[0, k, 1]}')
+        print(f'Optimiser: {opt_names[k]}, Mean Cross Entropy: {AccEntMeanErr[1, k, 0]}, Std: {AccEntMeanErr[1, k, 1]}')
 
     x_axis = np.arange(0, len(optimisers), 1)
     for i, title in enumerate(['Accuracy', 'Cross Entropy']):
@@ -63,7 +65,7 @@ def validate(n_epochs, optimisers, opt_names, Lmds, afs, shape, name):
         yerr = AccEntMeanErr[i, :, 1]
         plt.errorbar(x_axis, y, yerr, marker='s', mfc='red', linestyle='None')
         plt.tight_layout()
-        plt.savefig(f'Data/Plots/{name}{title}.png')
+        plt.savefig(f'Data/Plots/{name}{title}.pdf')
         plt.show()
 
 if __name__ == '__main__':
