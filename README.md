@@ -1,52 +1,64 @@
 # FYS-STK4155-Project-2
 
-Codebase for the second FYS-STK project. All of the actual calculations were done from the Jupyter notebook `Notebook.ipynb`, the rest of the python files are either tests or functions that are used by the notebook.
+Codebase for the second FYS-STK4155 project. We train a neural network to recognize the hand-written digits from the MNIST dataset.
+All of the actual calculations were done from the Jupyter notebook `Notebook.ipynb`, therefore you can simply run the notebook cell by cell to reproduce our results. The rest of the python files are either tests or functions that are used by the notebook.
 
-## NeuralNet.py
+### Requirements
 
-Class for a Neural network.
+In order to run the codes, you need python and in particular the `scikitlearn` library, which is used to import the MNIST dataset.
 
-## ActivaionFunctions.py
 
-Collection of functions for making the activation functions that the NN needs
+### Contents of the repository
 
-## optimisers.py
+*  ` NeuralNet.py `: class for a Neural network.
 
-Collection of optimisers for determining the parameters of a neural network
+*  ` ActivaionFunctions.py `: collection of functions for making the activation functions that the NN needs.
 
-## lrSchedules.py
+*  ` optimisers.py `: collection of optimisers for determining the parameters of a neural network.
 
-Collection of functions that define learning rate schedules for the neural network learningrate optimiser
+*  ` lrSchedules.py `: collection of functions that define learning rate schedules for the neural network learningrate optimiser.
 
-## Data.py
+*  ` Data.py `: function for importing the MNIST dataset from sklearn
 
-Function for importing the dataset from sklearn
+*  ` Hyper.py `: functions for optimising the hyperparameters
 
-## Hyper.py
+*  ` plot.py `: functions for plotting the results of Hyper.py `
 
-Functions for optimising the hyperparameters
+*  ` validate.py `
 
-## plot.py
-
-Functions for plotting the results of Hyper.py
-
-## validate.py
+*  ` /Data `: a folder containing both the plots and the data which are used to do the plots. The data are organized into subfolders,
+and they are saved in `numpy` format. 
 
 Function for testing a network on the validation data and plotting the results
 
-## plotweights.py
+*  ` plotweights.py `
 
 Function for plotting the weights of the first layer of a network
 
-## LinearGDtest.py and LinearModel.py and toy-gradient-descent.ipynb
+*  ` LinearGDtest.py `, `LinearModel.py `, `toy-gradient-descent.ipynb`
 
-Functions for testing the optimisers on a simple test case and generating the plots
+Functions for testing the optimisers on a simple test case and notebook for generating the plots
+
+### Authors
+
+<p align="center">
+<button  style="border: transparent; background-color: transparent;">
+    <img align="left" width=10% src="https://avatars.githubusercontent.com/u/89582342?v=4"> 
+</button>
+<button style="border: transparent; background-color: transparent;">
+    <img align="left" width=10% src="https://avatars.githubusercontent.com/u/111510879?v=4"> 
+</button>
+<button style="border: transparent; background-color: transparent;">
+    <img align="left" width=10% src="https://avatars.githubusercontent.com/u/74814411?v=4"> 
+</button>
+</p> 
 
 
-## solver.py
 
-Gradient Descent code for simple learning problems
 
-## tests.py
 
-Some tests to confirm that the optimisers and networks are working
+
+
+
+
+
