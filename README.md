@@ -43,7 +43,7 @@ Functions for testing the optimisers on a simple test case and notebook for gene
 
 <p align="center">
 <button  style="border: transparent; background-color: transparent;">
-    <img align="left" width=10% src="https://avatars.githubusercontent.com/u/89582342?v=4"> 
+    <img align="left" width=10% src="https://avatars.githubusercontent.com/u/89582342?v=4"> [Gianmarco](https://github.com/giammy00)
 </button>
 <button style="border: transparent; background-color: transparent;">
     <img align="left" width=10% src="https://avatars.githubusercontent.com/u/111510879?v=4"> 
