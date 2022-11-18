@@ -38,6 +38,11 @@ Function for testing a network on the validation data and plotting the results
 
 Function for plotting the weights of the first layer of a network
 
+## LinearGDtest.py and LinearModel.py and toy-gradient-descent.ipynb
+
+Functions for testing the optimisers on a simple test case and generating the plots
+
+
 ## solver.py
 
 Gradient Descent code for simple learning problems
