@@ -41,18 +41,9 @@ Functions for testing the optimisers on a simple test case and notebook for gene
 
 ### Authors
 
-<p align="center">
-<button  style="border: transparent; background-color: transparent;">
-    <img align="left" width=10% src="https://avatars.githubusercontent.com/u/89582342?v=4"> 
-</button> [Gianmarco](https://github.com/giammy00) <br>
-<button style="border: transparent; background-color: transparent;">
-    <img align="left" width=10% src="https://avatars.githubusercontent.com/u/111510879?v=4"> 
-</button>
-<button style="border: transparent; background-color: transparent;">
-    <img align="left" width=10% src="https://avatars.githubusercontent.com/u/74814411?v=4"> 
-</button>
-</p> 
-
+[Gianmarco Puleo](https://github.com/giammy00) <br>
+[David Svejda](https://github.com/DavidSvejda2507)<br>
+[Henrik Breitenstein](https://github.com/henrikbreitenstein)<br>
 
 
 
