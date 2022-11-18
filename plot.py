@@ -23,7 +23,7 @@ def plot_lr_epochs(filename: str, fig_name: str, fig_title: str, savepath: str):
     plt.ylabel("learning rate")
 
     plt.colorbar()
-    plt.title(fig_title)
+    #plt.title(fig_title)
     plt.tight_layout()
     plt.savefig(savepath)
     # plt.show()
@@ -46,7 +46,7 @@ def plot_lamda(filename: str, fig_title: str, savepath: str):
     ax1.set_ylabel("Accuracy")
     ax2.set_ylabel("Cross Entropy")
     plt.tight_layout()
-    ax1.set_title(fig_title)
+    #ax1.set_title(fig_title)
     fig.savefig(savepath)
     #fig.show()
 
