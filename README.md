@@ -24,20 +24,16 @@ In order to run the codes, you need python and in particular the `scikitlearn` l
 
 *  ` plot.py `: functions for plotting the results of Hyper.py `
 
-*  ` validate.py `
+*  ` validate.py `: function for testing a network on the validation data and plotting the results
 
 *  ` /Data `: a folder containing both the plots and the data which are used to do the plots. The data are organized into subfolders,
 and they are saved in `numpy` format. 
 
-Function for testing a network on the validation data and plotting the results
 
-*  ` plotweights.py `
 
-Function for plotting the weights of the first layer of a network
+*  ` plotweights.py `: function for plotting the weights of the first layer of a network
 
-*  ` LinearGDtest.py `, `LinearModel.py `, `toy-gradient-descent.ipynb`
-
-Functions for testing the optimisers on a simple test case and notebook for generating the plots
+*  ` LinearGDtest.py `, `LinearModel.py `, `toy-gradient-descent.ipynb`: functions for testing the optimisers on a simple test case and notebook for generating the plots.
 
 ### Authors
 
